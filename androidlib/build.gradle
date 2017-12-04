@@ -1,0 +1,43 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion rootProject.ext.COMPILE_SDK_VERSION
+    buildToolsVersion rootProject.ext.BUILD_TOOL_VERSION
+    defaultConfig {
+        minSdkVersion rootProject.ext.MIN_SDK_VERSION
+        targetSdkVersion rootProject.ext.TARGET_SDK_VERSION
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    //okhttp
+    compile files('libs/okhttp-3.5.0.jar')
+    compile files('libs/okio-1.11.0.jar')
+    //stetho
+    compile 'com.facebook.stetho:stetho:1.4.2'
+    //zxing
+    compile files('libs/zxing.jar')
+    compile files('libs/zbardecoder.jar')
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
+    //fresco
+    compile 'com.facebook.fresco:fresco:0.12.0'
+    //glide
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+    //support
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    //album
+    compile 'com.yanzhenjie:album:2.0.0-alpha'
+    //gson
+    compile 'com.google.code.gson:gson:2.7'
+    //material dialog
+    compile 'com.afollestad.material-dialogs:core:0.9.1.0'
+    compile 'com.afollestad.material-dialogs:commons:0.9.1.0'
+}

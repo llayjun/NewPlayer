@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="color_main_style">#09a7f1</color>
+
+    <color name="color_transparent">#00000000</color>
+    <color name="color_ffffff">#ffffff</color>
+    <color name="color_EDFAFF">#EDFAFF</color>
+    <color name="color_b1b1b1">#b1b1b1</color>
+    <color name="color_4c4c4c">#4c4c4c</color>
+    <color name="color_fafafa">#fafafa</color>
+    <color name="color_5c80a9">#5c80a9</color>
+    <color name="color_e4e2e2">#e4e2e2</color>
+    <color name="color_e1e1e1">#e1e1e1</color>
+    <color name="color_71d0f7">#71d0f7</color>
+    <color name="color_323232">#323232</color>
+    <color name="color_333333">#333333</color>
+    <color name="color_888888">#888888</color>
+    <color name="color_edf2f2">#edf2f1</color>
+    <color name="color_010101">#010101</color>
+    <color name="color_757575">#757575</color>
+    <color name="color_666666">#666666</color>
+    <color name="color_0079ab">#0079ab</color>
+    <color name="color_2871ca">#2871ca</color>
+    <color name="color_cf2e25">#cf2e25</color>
+    <color name="color_01b94f">#01b94f</color>
+    <color name="color_ec7a00">#ec7a00</color>
+    <color name="color_e4e4e4">#e4e4e4</color>
+    <color name="color_e6e6e6">#e6e6e6</color>
+    <color name="color_6ecaf5">#6ecaf5</color>
+    <color name="color_dbdbdb">#dbdbdb</color>
+    <color name="color_ff4c73">#ff4c73</color>
+    <color name="color_ffd200">#ffd200</color>
+    <color name="color_00ccff">#00ccff</color>
+    <color name="color_ffcccc">#ffcccc</color>
+    <color name="color_ccecff">#ccecff</color>
+    <color name="color_fff5cc">#fff5cc</color>
+    <color name="color_fce8b1">#fce8b1</color>
+    <color name="color_4abeed">#4abeed</color>
+    <color name="color_eab2f3">#eab2f3</color>
+    <color name="color_1ab2f3">#1ab2f3</color>
+    <color name="color_111111">#111111</color>
+    <color name="color_000000">#000000</color>
+    <color name="color_f6fcff">#f6fcff</color>
+    <color name="color_6dd4ff">#6dd4ff</color>
+    <color name="color_e4f7ff">#e4f7ff</color>
+    <color name="color_48c2f5">#48c2f5</color>
+    <color name="color_ffdc7c">#ffdc7c</color>
+    <color name="color_54e7b1">#54e7b1</color>
+    <color name="color_ff7c89">#ff7c89</color>
+    <color name="color_36b9f6">#36b9f6</color>
+    <color name="color_0f93e7">#0f93e7</color>
+    <color name="color_00464a">#00464a</color>
+    <color name="color_ff9c00">#ff9c00</color>
+    <color name="color_ff5022">#ff5022</color>
+    <color name="color_1c86ea">#1c86ea</color>
+    <color name="color_a6b0bd">#a6b0bd</color>
+    <color name="color_3e3a39">#3e3a39</color>
+    <color name="color_9e9e9f">#9e9e9f</color>
+    <color name="color_dbdcdc">#dbdcdc</color>
+    <color name="color_8dc21f">#8dc21f</color>
+    <color name="color_42a8fc">#42a8fc</color>
+    <color name="color_ebeef4">#ebeef4</color>
+    <color name="color_70839b">#70839b</color>
+    <color name="color_ed3f35">#ed3f35</color>
+    <color name="color_006db7">#006db7</color>
+
+    <color name="black_alpha">#66000000</color>
+
+    <!--drawable_btn_click-->
+    <color name="bind_cancel">#ff999999</color>
+    <color name="cancel_button">#CDC9C9</color>
+    <color name="cancel_button_press">#838B8B</color>
+
+</resources>

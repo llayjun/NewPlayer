@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:background="@drawable/common_popup_bg"
+    android:orientation="vertical"
+    android:paddingBottom="15dp"
+    android:paddingLeft="7dp"
+    android:paddingRight="7dp"
+    android:paddingTop="20dp">
+
+    <RelativeLayout
+        android:id="@+id/item0_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item0"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item0"
+            android:text="item0"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item1_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item1"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item1"
+            android:text="item1"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item2_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item2"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item2"
+            android:text="item2"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item3_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item3"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item3"
+            android:text="item3"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item4_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item4"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item4"
+            android:text="item4"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/item5_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/drawable_common_popup_click"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_item5"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:src="@mipmap/common_popup_icon" />
+
+        <TextView
+            android:id="@+id/tv_item5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/iv_item5"
+            android:text="item5"
+            android:textColor="@color/color_000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+
+</LinearLayout>

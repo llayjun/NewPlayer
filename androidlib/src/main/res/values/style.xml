@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- 标题栏样式 -->
+    <style name="TitleBar">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@color/color_1c86ea</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_height">50dp</item>
+    </style>
+
+    <!-- 标题栏字体样式 -->
+    <style name="TitleBarText">
+        <item name="android:textColor">@color/color_ffffff</item>
+        <item name="android:textSize">15dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- 星期单选框样式 -->
+    <style name="WeekCheckbox">
+        <item name="android:textColor">@color/color_000000</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <!--Bottom Popup Animation-->
+    <style name="bottom_popup_animation_style" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/pop_enter</item>
+        <item name="android:windowExitAnimation">@anim/pop_exit</item>
+    </style>
+
+    <!--Common Popup Animation-->
+    <style name="common_popup_animation_style">
+        <item name="android:windowEnterAnimation">@anim/top_popup_in</item>
+        <item name="android:windowExitAnimation">@anim/top_popup_out</item>
+    </style>
+
+</resources>

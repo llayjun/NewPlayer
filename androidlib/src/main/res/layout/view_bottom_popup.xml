@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_ffffff"
+        android:orientation="vertical"
+        android:paddingBottom="16dp"
+        android:paddingTop="20dp">
+
+        <Button
+            android:id="@+id/view_common_popup_camera"
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:layout_marginBottom="1dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/drawable_btn_click"
+            android:text="拍照"
+            android:textColor="@color/color_ffffff"
+            android:textSize="17dp" />
+
+        <Button
+            android:id="@+id/view_common_popup_photo"
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/drawable_btn_click"
+            android:text="相册"
+            android:textColor="@color/color_ffffff"
+            android:textSize="17dp" />
+
+        <Button
+            android:id="@+id/view_common_popup_cancel"
+            android:layout_width="fill_parent"
+            android:layout_height="45dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/drawable_btn_click"
+            android:text="取消"
+            android:textColor="@color/color_ffffff"
+            android:textSize="17dp" />
+    </LinearLayout>
+
+</LinearLayout>
