@@ -34,6 +34,8 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import nj.com.myplayer.listener.BatteryListener;
+import nj.com.myplayer.listener.BatteryStateListener;
 import nj.com.myplayer.model.MediaBean;
 import nj.com.myplayer.utils.FileUtil;
 
@@ -45,6 +47,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private ArrayList<MediaBean> mVideoList = new ArrayList<>();
     private File mFile = new File(Environment.getExternalStorageDirectory(), "millet");
 
+    //广播监听电量状态
+    private BatteryListener mBatteryListener;
     //UI
     //视屏
     private VideoView mVideoView;
@@ -57,6 +61,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private DanmakuContext mContext;
     //time
     private TextView mTime;
+    //screen image
+    private ImageView mScreenImage;
 
     //data
     //设置弹幕的最大显示行数
@@ -86,6 +92,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         initTime();
         initView();
         initDanmu();
+        initBattery();
     }
 
     @Override
@@ -268,6 +275,40 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         mIDanmakuView.addDanmaku(danmaku);
     }
 
+    private void initBattery() {
+        mScreenImage = (ImageView) findViewById(R.id.image_screen);
+        mBatteryListener = new BatteryListener(this);
+        mBatteryListener.register(new BatteryStateListener() {
+            @Override
+            public void onStateChanged() {
+
+            }
+
+            @Override
+            public void onStateLow() {
+
+            }
+
+            @Override
+            public void onStateOkay() {
+
+            }
+
+            @Override
+            public void onStatePowerConnected() {
+                mScreenImage.setVisibility(View.GONE);
+                mVideoView.setVolume(1f, 1f);
+            }
+
+            @Override
+            public void onStatePowerDisconnected() {
+                GlideUtils.loadImageView(MainActivity.this, R.mipmap.a, mScreenImage);
+                mScreenImage.setVisibility(View.VISIBLE);
+                mVideoView.setVolume(0f, 0f);
+            }
+        });
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -286,6 +327,9 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
     @Override
     protected void onDestroy() {
+        if (mBatteryListener != null) {
+            mBatteryListener.unregister();
+        }
         super.onDestroy();
         if (mIDanmakuView != null) {
             // dont forget release!

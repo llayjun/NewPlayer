@@ -42,4 +42,11 @@
         android:textColor="#ffffff"
         android:textSize="15sp"/>
 
+    <ImageView
+        android:id="@+id/image_screen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone"/>
+
 </RelativeLayout>

@@ -33,6 +33,11 @@ public class GlideUtils {
         Glide.with(mContext).load(path).into(mImageView);
     }
 
+    //加载图片
+    public static void loadImageView(Context mContext, int _imageId, ImageView mImageView) {
+        Glide.with(mContext).load(_imageId).into(mImageView);
+    }
+
     //加载指定大小
     public static void loadImageViewSize(Context mContext, String path, int width, int height, ImageView mImageView) {
         Glide.with(mContext).load(path).override(width, height).into(mImageView);
