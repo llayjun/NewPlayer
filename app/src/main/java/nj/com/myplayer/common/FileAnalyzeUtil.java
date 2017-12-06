@@ -8,7 +8,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.PlayerTimeList;
@@ -21,18 +23,20 @@ import nj.com.myplayer.model.TextBean;
 
 public class FileAnalyzeUtil {
 
-    private static final String HEADER_TEXT = "roll";  //弹幕指令开头
-    private static final String HEADER_PLAYER = "player";  //播放文件指令开头
-    private static final String HEADER_PLAY_TIME = "time"; //播放列表指令开头
+    private static final String FLAG_TEXT = "text";  //弹幕指令标识
+    private static final String FLAG_PLAYER = "player";  //播放指令标识
+
+    private static final String END_TEXT = ".json";  //弹幕指令文件扩展名
+    private static final String END_PLAYER = ".xml"; //播放指令文件扩展名
 
     /**
-     * 解析指定文件夹下所有弹幕指令文件
+     * 解析弹幕指令
      *
-     * @param filePath
-     * @return
+     * @param filePath 文件路径
+     * @return List
      */
     public static List<TextBean> getTextList(String filePath) {
-        List<TextBean> resultList = new ArrayList<>();
+        List<TextBean> resultList = new ArrayList<TextBean>();
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
@@ -42,14 +46,15 @@ public class FileAnalyzeUtil {
                 String tempFileName, tempFileContents, instructFileType;
                 for (File tempFile : fileList) {
                     tempFileName = tempFile.getName();
-                    if (tempFileName.startsWith(HEADER_TEXT)) {
+                    if (tempFileName.endsWith(END_TEXT)) {
                         tempFileContents = FileReadUtil.getStringFromFile(tempFile);
                         instructFileType = getValueByKey("instructFileType", tempFileContents);
-                        if (HEADER_TEXT.equals(instructFileType)) {
+                        if (FLAG_TEXT.equals(instructFileType)) {
                             TextBean textBean = JsonUtil.fromJson(tempFileContents, TextBean.class);
                             if (!ObjectUtils.isNullOrEmpty(textBean)) {
-                                //时间校验加在此处
+                                String currentTime = textBean.getTimeCheck(); //当前时间 时间校验加在此处
                                 resultList.add(textBean);
+                                tempFile.delete();//指令文件解析后直接删除
                             }
                         }
                     }
@@ -58,90 +63,63 @@ public class FileAnalyzeUtil {
                 return resultList;
             }
         } catch (Exception e) {
-            resultList = new ArrayList<>();
+            resultList = new ArrayList<TextBean>();
             e.printStackTrace();
         }
         return resultList;
     }
 
     /**
-     * 解析指定文件夹下所有播放器指令文件
+     * 解析播放列表指令
      *
-     * @param filePath
-     * @return
+     * @param filePath 文件路径
+     * @return Map playTimeList-播放时间表  playerList-播放文件列表
      */
-    public static List<PlayerBean> getPlayerFileList(String filePath) {
-        List<PlayerBean> resultList = new ArrayList<PlayerBean>();
+    public static Map<String, List> getPlayerFileList(String filePath) {
+        Map<String, List> resultMap = new HashMap<String, List>();
+        List<PlayerBean> playerList = new ArrayList<PlayerBean>();
+        List<PlayerTimeList> playTimeList = new ArrayList<PlayerTimeList>();
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
             if (ObjectUtils.isNullOrEmpty(fileList)) {
-                return resultList;
+                return resultMap;
             } else {
-                String tempFileName, tempFileContents, instructFileType, listJson;
+                String tempFileName, tempFileContents, instructFileType, listJson, objectJson;
                 for (File tempFile : fileList) {
                     tempFileName = tempFile.getName();
-                    if (tempFileName.startsWith(HEADER_PLAYER)) {
+                    if (tempFileName.endsWith(END_PLAYER)) {
                         tempFileContents = FileReadUtil.getStringFromFile(tempFile);
                         instructFileType = getValueByKey("instructFileType", tempFileContents);
-                        if (HEADER_PLAYER.equals(instructFileType)) {
+                        if (FLAG_PLAYER.equals(instructFileType)) {
+                            //播放列表
                             listJson = getStringByKey("list", tempFileContents);
-                            List<PlayerBean> playerList = JsonUtil.fromJson(listJson, new TypeToken<List<PlayerBean>>() {
+                            List<PlayerBean> tempPlayerList = JsonUtil.fromJson(listJson, new TypeToken<List<PlayerBean>>() {
                             }.getType());
-                            if (!ObjectUtils.isNullOrEmpty(playerList)) {
-                                resultList.addAll(playerList);
+                            if (!ObjectUtils.isNullOrEmpty(tempPlayerList)) {
+                                playerList.addAll(tempPlayerList);
                             }
+                            //播列表参数（列表序号、开始时间、结束时间）
+                            objectJson = getValueByKey("playTimeInfo", tempFileContents);
+                            PlayerTimeList playerTime = JsonUtil.fromJson(objectJson, PlayerTimeList.class);
+                            if (!ObjectUtils.isNullOrEmpty(playerTime)) {
+                                playTimeList.add(playerTime);
+                            }
+                            tempFile.delete();//指令文件解析后直接删除
                         }
                     }
                 }
-                Collections.sort(resultList);
-                return resultList;
+                Collections.sort(playerList);
+                Collections.sort(playTimeList);
+                resultMap.put("playerList", playerList);
+                resultMap.put("playTimeList", playTimeList);
+                return resultMap;
             }
         } catch (Exception e) {
-            resultList = new ArrayList<>();
+            resultMap = new HashMap<String, List>();
             e.printStackTrace();
         }
-        return resultList;
-    }
-
-    /**
-     * 解析指定文件夹下所有播放器指令文件
-     *
-     * @param filePath
-     * @return
-     */
-    public static List<PlayerTimeList> getPlayerTimeFileList(String filePath) {
-        List<PlayerTimeList> resultList = new ArrayList<>();
-        try {
-            File rootPath = new File(filePath);
-            File fileList[] = rootPath.listFiles();
-            if (ObjectUtils.isNullOrEmpty(fileList)) {
-                return resultList;
-            } else {
-                String tempFileName, tempFileContents, instructFileType, listJson;
-                for (File tempFile : fileList) {
-                    tempFileName = tempFile.getName();
-                    if (tempFileName.startsWith(HEADER_PLAY_TIME)) {
-                        tempFileContents = FileReadUtil.getStringFromFile(tempFile);
-                        instructFileType = getValueByKey("instructFileType", tempFileContents);
-                        if (HEADER_PLAY_TIME.equals(instructFileType)) {
-                            listJson = getStringByKey("list", tempFileContents);
-                            List<PlayerTimeList> playerList = JsonUtil.fromJson(listJson, new TypeToken<List<PlayerTimeList>>() {
-                            }.getType());
-                            if (!ObjectUtils.isNullOrEmpty(playerList)) {
-                                resultList.addAll(playerList);
-                            }
-                        }
-                    }
-                }
-                Collections.sort(resultList);
-                return resultList;
-            }
-        } catch (Exception e) {
-            resultList = new ArrayList<>();
-            e.printStackTrace();
-        }
-        return resultList;
+        return resultMap;
     }
 
     /**
