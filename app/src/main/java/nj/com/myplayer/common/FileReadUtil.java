@@ -34,7 +34,6 @@ public class FileReadUtil {
 
     /**
      * file —> string
-     *
      * @param file 文件路径
      * @return string
      */
