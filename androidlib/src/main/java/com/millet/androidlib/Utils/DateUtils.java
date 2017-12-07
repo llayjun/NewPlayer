@@ -813,5 +813,26 @@ public class DateUtils {
                 return "未知";
         }
     }
+
+    /**
+     * 将标准格式的时间（MM/dd/yyyy HH:mm:ss）转换为微信服务器的long型
+     *
+     * @param formatTime
+     * @return
+     * @throws ParseException
+     */
+    public static long formatToLongTime(String formatTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat(FMT_YMD_HMS);
+        Date dt2;
+        try {
+            dt2 = sdf.parse(formatTime);
+            return dt2.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        //转换失败返回值
+        return -1;
+    }
+
 }
 

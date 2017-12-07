@@ -54,7 +54,7 @@ public class FileAnalyzeUtil {
                             if (!ObjectUtils.isNullOrEmpty(textBean)) {
                                 String currentTime = textBean.getTimeCheck(); //当前时间 时间校验加在此处
                                 resultList.add(textBean);
-                                tempFile.delete();//指令文件解析后直接删除
+//                                tempFile.delete();//指令文件解析后直接删除
                             }
                         }
                     }
@@ -105,7 +105,7 @@ public class FileAnalyzeUtil {
                             if (!ObjectUtils.isNullOrEmpty(playerTime)) {
                                 playTimeList.add(playerTime);
                             }
-                            tempFile.delete();//指令文件解析后直接删除
+//                            tempFile.delete();//指令文件解析后直接删除
                         }
                     }
                 }

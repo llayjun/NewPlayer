@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.millet.androidlib.Base.BaseActivity;
+import com.millet.androidlib.Utils.DateUtils;
 import com.millet.androidlib.Utils.GlideUtils;
 import com.millet.androidlib.Utils.TextUtils;
 
@@ -34,9 +35,11 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import nj.com.myplayer.common.FileAnalyzeUtil;
 import nj.com.myplayer.listener.BatteryListener;
 import nj.com.myplayer.listener.BatteryStateListener;
 import nj.com.myplayer.model.MediaBean;
+import nj.com.myplayer.model.TextBean;
 import nj.com.myplayer.utils.FileUtil;
 
 public class MainActivity extends BaseActivity implements MediaPlayer.OnCompletionListener, Runnable {
@@ -44,7 +47,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private String url1 = "http://112.253.22.157/17/z/z/y/u/zzyuasjwufnqerzvyxgkuigrkcatxr/hc.yinyuetai.com/D046015255134077DDB3ACA0D7E68D45.flv";
     private String url2 = "http://flashmedia.eastday.com/newdate/news/2016-11/shznews1125-19.mp4";
     private String url3 = Environment.getExternalStorageDirectory() + "/a.mp4";
-    private ArrayList<MediaBean> mVideoList = new ArrayList<>();
     private File mFile = new File(Environment.getExternalStorageDirectory(), "millet");
 
     //广播监听电量状态
@@ -69,8 +71,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
     //设置是否禁止重叠
     private HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
-    private int mIndex = 0;//记录已经播放到第几个了
     private ImageHandler mImageHandler = new ImageHandler();
+    private int mIndex = 0;//记录已经播放到第几个了
+    private ArrayList<MediaBean> mVideoList = new ArrayList<>();
+    private ArrayList<TextBean> mTextBeenList = new ArrayList<>();
 
     @Override
     protected void initData(Bundle savedInstanceState) {
@@ -82,6 +86,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         window.setFlags(flag, flag);
         Vitamio.initialize(this);
         FileUtil.getVideoFile(mVideoList, mFile);
+        mTextBeenList = (ArrayList<TextBean>) FileAnalyzeUtil.getTextList(mFile.getPath());
     }
 
     @Override
@@ -164,6 +169,14 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                     break;
                 case MSG_TIME:
                     mTime.setText(msg.obj.toString());
+                    for (TextBean _textBean : mTextBeenList) {
+                        long _starTextTime = DateUtils.formatToLongTime("2017-12-07 20:48:20");
+                        long _endTextTime = DateUtils.formatToLongTime("2017-12-07 20:48:50");
+                        long _currentTime = System.currentTimeMillis();
+                        if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
+                            addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
+                        }
+                    }
                     break;
                 default:
                     break;
@@ -214,12 +227,12 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
             mIDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
-                    System.out.println("xiaomi" + "updateTimer" + timer.currMillisecond + " " + timer.lastInterval());
+                    System.out.println("xiaomi" + "updateTimer" + System.currentTimeMillis());
                 }
 
                 @Override
                 public void drawingFinished() {
-                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 40);
+//                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 40);
                 }
 
                 @Override
@@ -230,7 +243,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 @Override
                 public void prepared() {
                     mIDanmakuView.start();
-                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
+//                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
                 }
             });
 
