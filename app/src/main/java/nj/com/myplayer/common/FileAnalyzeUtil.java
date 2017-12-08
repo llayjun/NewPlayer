@@ -15,6 +15,7 @@ import java.util.Map;
 import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.PlayerTimeList;
 import nj.com.myplayer.model.TextBean;
+import nj.com.myplayer.utils.DateUtil;
 
 
 /**
@@ -103,6 +104,8 @@ public class FileAnalyzeUtil {
                             objectJson = getValueByKey("playTimeInfo", tempFileContents);
                             PlayerTimeList playerTime = JsonUtil.fromJson(objectJson, PlayerTimeList.class);
                             if (!ObjectUtils.isNullOrEmpty(playerTime)) {
+                                playerTime.setBeginTime(DateUtil.timeFormat(playerTime.getBeginTime()));
+                                playerTime.setEndTime(DateUtil.timeFormat(playerTime.getEndTime()));
                                 playTimeList.add(playerTime);
                             }
 //                            tempFile.delete();//指令文件解析后直接删除

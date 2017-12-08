@@ -169,14 +169,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                     break;
                 case MSG_TIME:
                     mTime.setText(msg.obj.toString());
-                    for (TextBean _textBean : mTextBeenList) {
-                        long _starTextTime = DateUtils.formatToLongTime("2017-12-07 20:48:20");
-                        long _endTextTime = DateUtils.formatToLongTime("2017-12-07 20:48:50");
-                        long _currentTime = System.currentTimeMillis();
-                        if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
-                            addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
-                        }
-                    }
                     break;
                 default:
                     break;
@@ -209,13 +201,13 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
         // 设置是否禁止重叠
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
-        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
                 .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
                 .setScrollSpeedFactor(1.2f) //设置弹幕滚动速度系数,只对滚动弹幕有效
                 .setScaleTextSize(1.2f)
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair)//设置防弹幕重叠，null为允许重叠
+                .setMarginTop(20)
                 .setDanmakuMargin(40);
         if (mIDanmakuView != null) {
             mBaseDanmakuParser = new BaseDanmakuParser() {
@@ -228,22 +220,60 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
                     System.out.println("xiaomi" + "updateTimer" + System.currentTimeMillis());
+                    System.out.println("updateTimer" + Thread.currentThread().getName());
                 }
 
                 @Override
                 public void drawingFinished() {
-//                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 40);
+                    System.out.println("drawingFinished" + Thread.currentThread().getName());
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            long _currentTime = System.currentTimeMillis();
+//                            long _time = 0;
+//                            for (TextBean _textBean : mTextBeenList) {
+//                                long _starTextTime = DateUtils.formatToLongTime("2017-12-08 17:00:00");
+//                                long _endTextTime = DateUtils.formatToLongTime("2017-12-08 17:50:50");
+//                                if (_starTextTime > _currentTime) {
+//                                    _time = _starTextTime - _currentTime;
+//                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+//                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
+//                                    _time = mIDanmakuView.getCurrentTime();
+//                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+//                                }
+//                            }
+//                        }
+//                    });
                 }
 
                 @Override
                 public void danmakuShown(BaseDanmaku danmaku) {
-
+                    System.out.println("xiaomi" + "danmakuShown" + danmaku.text);
+                    System.out.println("danmakuShown" + Thread.currentThread().getName());
                 }
 
                 @Override
                 public void prepared() {
                     mIDanmakuView.start();
-//                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
+                    System.out.println("prepared" + Thread.currentThread().getName());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            long _currentTime = System.currentTimeMillis();
+                            long _time = 0;
+                            for (TextBean _textBean : mTextBeenList) {
+                                long _starTextTime = DateUtils.formatToLongTime("2017-12-08 17:00:00");
+                                long _endTextTime = DateUtils.formatToLongTime("2017-12-08 17:50:50");
+                                if (_starTextTime > _currentTime) {
+                                    _time = _starTextTime - _currentTime;
+                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
+                                    _time = mIDanmakuView.getCurrentTime();
+                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+                                }
+                            }
+                        }
+                    });
                 }
             });
 
@@ -261,7 +291,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public boolean onViewClick(IDanmakuView view) {
-                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, "哈哈哈哈哈哈", 20);
                     if (mVideoView.getVisibility() == View.VISIBLE) {
                         mMediaController.show();
                     } else {
@@ -276,7 +305,13 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         }
     }
 
-    private void addDanmaku(int _type, String _content, float _size) {
+    /**
+     * @param _type
+     * @param _content
+     * @param _size
+     * @param _timer   弹幕运行了多长时间开始显示
+     */
+    private void addDanmaku(int _type, String _content, float _size, long _timer) {
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(_type);
         danmaku.text = _content;
         danmaku.padding = 25;
@@ -284,7 +319,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         danmaku.isLive = false;
         danmaku.textSize = TextUtils.sp2px(this, _size);
         danmaku.textColor = Color.WHITE;
-        danmaku.setTime(mIDanmakuView.getCurrentTime());
+        danmaku.setTime(_timer);
         mIDanmakuView.addDanmaku(danmaku);
     }
 
