@@ -201,13 +201,13 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
         // 设置是否禁止重叠
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
+        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
                 .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
                 .setScrollSpeedFactor(1.2f) //设置弹幕滚动速度系数,只对滚动弹幕有效
                 .setScaleTextSize(1.2f)
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair)//设置防弹幕重叠，null为允许重叠
-                .setMarginTop(20)
                 .setDanmakuMargin(40);
         if (mIDanmakuView != null) {
             mBaseDanmakuParser = new BaseDanmakuParser() {
@@ -221,29 +221,31 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 public void updateTimer(DanmakuTimer timer) {
                     System.out.println("xiaomi" + "updateTimer" + System.currentTimeMillis());
                     System.out.println("updateTimer" + Thread.currentThread().getName());
+                    int _zero = (int) (timer.currMillisecond / 1000) % 10;
+                    if (_zero == 0) return;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            long _currentTime = System.currentTimeMillis();
+                            long _time = 0;
+                            for (TextBean _textBean : mTextBeenList) {
+                                long _starTextTime = DateUtils.formatToLongTime("2017-12-10 17:08:00");
+                                long _endTextTime = DateUtils.formatToLongTime("2017-12-10 17:50:50");
+                                if (_starTextTime > _currentTime) {
+                                    _time = _starTextTime - _currentTime;
+                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
+                                    _time = mIDanmakuView.getCurrentTime();
+                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+                                }
+                            }
+                        }
+                    });
                 }
 
                 @Override
                 public void drawingFinished() {
                     System.out.println("drawingFinished" + Thread.currentThread().getName());
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            long _currentTime = System.currentTimeMillis();
-//                            long _time = 0;
-//                            for (TextBean _textBean : mTextBeenList) {
-//                                long _starTextTime = DateUtils.formatToLongTime("2017-12-08 17:00:00");
-//                                long _endTextTime = DateUtils.formatToLongTime("2017-12-08 17:50:50");
-//                                if (_starTextTime > _currentTime) {
-//                                    _time = _starTextTime - _currentTime;
-//                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-//                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
-//                                    _time = mIDanmakuView.getCurrentTime();
-//                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-//                                }
-//                            }
-//                        }
-//                    });
                 }
 
                 @Override
@@ -256,24 +258,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 public void prepared() {
                     mIDanmakuView.start();
                     System.out.println("prepared" + Thread.currentThread().getName());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            long _currentTime = System.currentTimeMillis();
-                            long _time = 0;
-                            for (TextBean _textBean : mTextBeenList) {
-                                long _starTextTime = DateUtils.formatToLongTime("2017-12-08 17:00:00");
-                                long _endTextTime = DateUtils.formatToLongTime("2017-12-08 17:50:50");
-                                if (_starTextTime > _currentTime) {
-                                    _time = _starTextTime - _currentTime;
-                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
-                                    _time = mIDanmakuView.getCurrentTime();
-                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-                                }
-                            }
-                        }
-                    });
                 }
             });
 
