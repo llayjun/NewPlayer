@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package nj.com.myplayer;
+package nj.com.myplayer.common;
 
 import android.graphics.Color;
 import android.text.TextUtils;

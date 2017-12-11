@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.millet.androidlib.Base.BaseActivity;
 import com.millet.androidlib.Utils.DateUtils;
 import com.millet.androidlib.Utils.GlideUtils;
+import com.millet.androidlib.Utils.SharedPreferencesHelper;
 import com.millet.androidlib.Utils.TextUtils;
 
 import java.io.File;
@@ -23,6 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
@@ -35,12 +38,13 @@ import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import nj.com.myplayer.common.Constant;
 import nj.com.myplayer.common.FileAnalyzeUtil;
 import nj.com.myplayer.listener.BatteryListener;
 import nj.com.myplayer.listener.BatteryStateListener;
-import nj.com.myplayer.model.MediaBean;
+import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.TextBean;
-import nj.com.myplayer.utils.FileUtil;
+import nj.com.myplayer.utils.DateUtil;
 
 public class MainActivity extends BaseActivity implements MediaPlayer.OnCompletionListener, Runnable {
 
@@ -73,8 +77,11 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
     private ImageHandler mImageHandler = new ImageHandler();
     private int mIndex = 0;//记录已经播放到第几个了
-    private ArrayList<MediaBean> mVideoList = new ArrayList<>();
-    private ArrayList<TextBean> mTextBeenList = new ArrayList<>();
+    //播放的字幕
+    private ArrayList<TextBean> mTextList = new ArrayList<>();
+    //准备播放的列表
+    private List<PlayerBean.PlayerInfo> mNowPlayInfoList = new ArrayList<>();
+    private PlayerBean.PlayTimeInfo mPlayerTime;
 
     @Override
     protected void initData(Bundle savedInstanceState) {
@@ -85,8 +92,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         //设置当前窗体为全屏显示
         window.setFlags(flag, flag);
         Vitamio.initialize(this);
-        FileUtil.getVideoFile(mVideoList, mFile);
-        mTextBeenList = (ArrayList<TextBean>) FileAnalyzeUtil.getTextList(mFile.getPath());
+//        mTextList = (ArrayList<TextBean>) FileAnalyzeUtil.getTextList(mFile.getPath());
+        FileAnalyzeUtil.savePlayInfo2Shared(this, mFile.getPath());
     }
 
     @Override
@@ -98,6 +105,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         initView();
         initDanmu();
         initBattery();
+        playMedia();
     }
 
     @Override
@@ -118,7 +126,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         mVideoView.setVideoQuality(MediaPlayer.VIDEOQUALITY_HIGH);//设置播放画质 高画质
         mVideoView.requestFocus();//取得焦点
         mVideoView.setOnCompletionListener(this);
-        playMedia();
     }
 
     @Override
@@ -130,31 +137,54 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      * 播放视屏或者图片
      */
     private void playMedia() {
-        if (mIndex >= mVideoList.size()) {
-            mIndex = 0;
+        if (mIndex >= mNowPlayInfoList.size() || mNowPlayInfoList.size() <= 0) {
+            GlideUtils.loadImageView(this, R.mipmap.a, mImageView);
+            mImageView.setVisibility(View.VISIBLE);
+            mVideoView.setVisibility(View.GONE);
+            return;
         }
-        int _mediaType = mVideoList.get(mIndex).getType();
+        String _mediaType = mNowPlayInfoList.get(mIndex).getFileType();
+        String _filePath = getMediaPath(mNowPlayInfoList.get(mIndex).getFileName());
+        if (android.text.TextUtils.isEmpty(_filePath)) {
+            mIndex += 1;
+            mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+            return;
+        }
         switch (_mediaType) {
-            case MediaBean.MEDIA_TYPE_VIDEO:
-                mVideoView.setVideoURI(Uri.parse(mVideoList.get(mIndex).getMediaPath()));
+            case Constant.VIDEO:
+                mVideoView.setVideoURI(Uri.parse(_filePath));
                 mVideoView.start();
                 mVideoView.setVisibility(View.VISIBLE);
                 mImageView.setVisibility(View.GONE);
                 break;
-            case MediaBean.MEDIA_TYPE_IMAGE:
-                GlideUtils.loadImageView(this, mVideoList.get(mIndex).getMediaPath(), mImageView);
+            case Constant.IMAGE:
+                GlideUtils.loadImageView(this, _filePath, mImageView);
                 mImageView.setVisibility(View.VISIBLE);
                 mVideoView.setVisibility(View.GONE);
-                mImageHandler.sendEmptyMessageDelayed(ImageHandler.MSG_SEND, ImageHandler.IMAGE_SHOW_TIME);
+                long _playLength = Long.parseLong(mNowPlayInfoList.get(mIndex).getPlayLength());
+                mImageHandler.sendEmptyMessageDelayed(ImageHandler.MSG_SEND, _playLength);
                 break;
         }
         mIndex += 1;
     }
 
+    /**
+     * 获取文件路径
+     *
+     * @param _fileName
+     * @return
+     */
+    private String getMediaPath(String _fileName) {
+        String _filePath = "";
+        if (android.text.TextUtils.isEmpty(_fileName)) return _filePath;
+        File _file = new File(mFile, _fileName);
+        if (!_file.exists()) return _filePath;
+        _filePath = _file.getPath();
+        return _filePath;
+    }
+
     public class ImageHandler extends Handler {
 
-        //图片显示几秒
-        public static final long IMAGE_SHOW_TIME = 2000;
         //传递下一个播放消息
         public static final int MSG_SEND = 1;
         //时间显示
@@ -169,6 +199,38 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                     break;
                 case MSG_TIME:
                     mTime.setText(msg.obj.toString());
+                    long _currentTime = System.currentTimeMillis() / 1000;
+                    Map<String, ?> _stringMap = SharedPreferencesHelper.getInstance(MainActivity.this).getAll();
+                    if (_stringMap.containsKey(String.valueOf(_currentTime))) {
+                        String _playJsonString = (String) _stringMap.get(String.valueOf(_currentTime));
+                        PlayerBean _playerBean = FileAnalyzeUtil.getReadyPlayerFileList(_playJsonString);
+                        mNowPlayInfoList.clear();
+                        mNowPlayInfoList = _playerBean.getList();
+                        mPlayerTime = _playerBean.getPlayTimeInfo();
+                        mIndex = 0;
+                        mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                    }
+                    if (null == mPlayerTime) return;
+                    String _playEndTime = mPlayerTime.getEndTime();
+                    long _endPlayerTime = DateUtils.formatToLongTime(DateUtil.timeFormat(_playEndTime)) / 1000;
+                    if (_currentTime == _endPlayerTime) {
+                        mNowPlayInfoList.clear();
+                        mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                    }
+
+//                    long _currentTime = System.currentTimeMillis();
+//                    long _time = 0;
+//                    for (TextBean _textBean : mTextList) {
+//                        long _starTextTime = DateUtils.formatToLongTime("2017-12-11 09:50:00");
+//                        long _endTextTime = DateUtils.formatToLongTime("2017-12-11 10:00:00");
+//                        if (_starTextTime > _currentTime) {
+//                            _time = _starTextTime - _currentTime;
+//                            addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+//                        } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
+//                            _time = mIDanmakuView.getCurrentTime();
+//                            addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
+//                        }
+//                    }
                     break;
                 default:
                     break;
@@ -221,26 +283,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 public void updateTimer(DanmakuTimer timer) {
                     System.out.println("xiaomi" + "updateTimer" + System.currentTimeMillis());
                     System.out.println("updateTimer" + Thread.currentThread().getName());
-                    int _zero = (int) (timer.currMillisecond / 1000) % 10;
-                    if (_zero == 0) return;
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            long _currentTime = System.currentTimeMillis();
-                            long _time = 0;
-                            for (TextBean _textBean : mTextBeenList) {
-                                long _starTextTime = DateUtils.formatToLongTime("2017-12-10 17:08:00");
-                                long _endTextTime = DateUtils.formatToLongTime("2017-12-10 17:50:50");
-                                if (_starTextTime > _currentTime) {
-                                    _time = _starTextTime - _currentTime;
-                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-                                } else if ((_starTextTime <= _currentTime) && (_currentTime <= _endTextTime)) {
-                                    _time = mIDanmakuView.getCurrentTime();
-                                    addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, _textBean.getContent(), 20, _time);
-                                }
-                            }
-                        }
-                    });
                 }
 
                 @Override

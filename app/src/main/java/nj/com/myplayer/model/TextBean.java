@@ -12,6 +12,7 @@ public class TextBean extends BasicBean {
 
     public static final String TEXT_SIZE = "text-big";//文字的大小
 
+    private int rollTimes;//播放次数
 
     private String position;  //弹幕位置
 
@@ -21,11 +22,19 @@ public class TextBean extends BasicBean {
 
     private String textBeginTime;  //弹幕开始时间
 
-    private String textEndTime;  //弹幕结束时间
+//    private String textEndTime;  //弹幕结束时间
 
     private String timeCheck;   //当前时间（用于时间校准）
 
     private String content;  //弹幕内容
+
+    public int getRollTimes() {
+        return rollTimes;
+    }
+
+    public void setRollTimes(int _rollTimes) {
+        rollTimes = _rollTimes;
+    }
 
     public String getPosition() {
         return position;
@@ -59,13 +68,13 @@ public class TextBean extends BasicBean {
         this.textBeginTime = textBeginTime;
     }
 
-    public String getTextEndTime() {
-        return textEndTime;
-    }
+//    public String getTextEndTime() {
+//        return textEndTime;
+//    }
 
-    public void setTextEndTime(String textEndTime) {
-        this.textEndTime = textEndTime;
-    }
+//    public void setTextEndTime(String textEndTime) {
+//        this.textEndTime = textEndTime;
+//    }
 
     public String getTimeCheck() {
         return timeCheck;

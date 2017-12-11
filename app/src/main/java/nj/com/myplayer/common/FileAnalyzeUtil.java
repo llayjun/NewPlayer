@@ -1,19 +1,19 @@
 package nj.com.myplayer.common;
 
 
-import com.google.gson.reflect.TypeToken;
+import android.content.Context;
+
+import com.millet.androidlib.Utils.DateUtils;
+import com.millet.androidlib.Utils.SharedPreferencesHelper;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import nj.com.myplayer.model.PlayerBean;
-import nj.com.myplayer.model.PlayerTimeList;
 import nj.com.myplayer.model.TextBean;
 import nj.com.myplayer.utils.DateUtil;
 
@@ -29,6 +29,9 @@ public class FileAnalyzeUtil {
 
     private static final String END_TEXT = ".json";  //弹幕指令文件扩展名
     private static final String END_PLAYER = ".xml"; //播放指令文件扩展名
+
+    public static final String PLAYER_LIST = "playerList";//播放列表
+    public static final String PLAY_TIME_LIST = "playTimeList";//播放列表时间
 
     /**
      * 解析弹幕指令
@@ -70,59 +73,120 @@ public class FileAnalyzeUtil {
         return resultList;
     }
 
+//    /**
+//     * 解析播放列表指令
+//     *
+//     * @param filePath 文件路径
+//     * @return Map playTimeList-播放时间表  playerList-播放文件列表
+//     */
+//    public static Map<String, List> getPlayerFileList(String filePath) {
+//        Map<String, List> resultMap = new HashMap<String, List>();
+//        List<PlayerBean> playerList = new ArrayList<PlayerBean>();
+//        List<PlayerTime> playTimeList = new ArrayList<PlayerTime>();
+//        try {
+//            File rootPath = new File(filePath);
+//            File fileList[] = rootPath.listFiles();
+//            if (ObjectUtils.isNullOrEmpty(fileList)) {
+//                return resultMap;
+//            } else {
+//                String tempFileName, tempFileContents, instructFileType, listJson, objectJson;
+//                for (File tempFile : fileList) {
+//                    tempFileName = tempFile.getName();
+//                    if (tempFileName.endsWith(END_PLAYER)) {
+//                        tempFileContents = FileReadUtil.getStringFromFile(tempFile);
+//                        instructFileType = getValueByKey("instructFileType", tempFileContents);
+//                        if (FLAG_PLAYER.equals(instructFileType)) {
+//                            //播放列表
+//                            listJson = getStringByKey("list", tempFileContents);
+//                            List<PlayerBean> tempPlayerList = JsonUtil.fromJson(listJson, new TypeToken<List<PlayerBean>>() {
+//                            }.getType());
+//                            if (!ObjectUtils.isNullOrEmpty(tempPlayerList)) {
+//                                playerList.addAll(tempPlayerList);
+//                            }
+//                            //播列表参数（列表序号、开始时间、结束时间）
+//                            objectJson = getValueByKey("playTimeInfo", tempFileContents);
+//                            PlayerTime playerTime = JsonUtil.fromJson(objectJson, PlayerTime.class);
+//                            if (!ObjectUtils.isNullOrEmpty(playerTime)) {
+//                                playerTime.setBeginTime(DateUtil.timeFormat(playerTime.getBeginTime()));
+//                                playerTime.setEndTime(DateUtil.timeFormat(playerTime.getEndTime()));
+//                                playTimeList.add(playerTime);
+//                            }
+////                            tempFile.delete();//指令文件解析后直接删除
+//                        }
+//                    }
+//                }
+//                Collections.sort(playerList);
+//                Collections.sort(playTimeList);
+//                resultMap.put(PLAYER_LIST, playerList);
+//                resultMap.put(PLAY_TIME_LIST, playTimeList);
+//                return resultMap;
+//            }
+//        } catch (Exception e) {
+//            resultMap = new HashMap<String, List>();
+//            e.printStackTrace();
+//        }
+//        return resultMap;
+//    }
+
     /**
-     * 解析播放列表指令
+     * 解析播放列表指令，根据文件的开始时间存储到sp中
      *
      * @param filePath 文件路径
-     * @return Map playTimeList-播放时间表  playerList-播放文件列表
      */
-    public static Map<String, List> getPlayerFileList(String filePath) {
-        Map<String, List> resultMap = new HashMap<String, List>();
-        List<PlayerBean> playerList = new ArrayList<PlayerBean>();
-        List<PlayerTimeList> playTimeList = new ArrayList<PlayerTimeList>();
+    public static void savePlayInfo2Shared(Context _context, String filePath) {
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
             if (ObjectUtils.isNullOrEmpty(fileList)) {
-                return resultMap;
+                return;
             } else {
-                String tempFileName, tempFileContents, instructFileType, listJson, objectJson;
+                String tempFileName, tempFileContents, instructFileType, objectJson;
                 for (File tempFile : fileList) {
                     tempFileName = tempFile.getName();
                     if (tempFileName.endsWith(END_PLAYER)) {
                         tempFileContents = FileReadUtil.getStringFromFile(tempFile);
                         instructFileType = getValueByKey("instructFileType", tempFileContents);
                         if (FLAG_PLAYER.equals(instructFileType)) {
-                            //播放列表
-                            listJson = getStringByKey("list", tempFileContents);
-                            List<PlayerBean> tempPlayerList = JsonUtil.fromJson(listJson, new TypeToken<List<PlayerBean>>() {
-                            }.getType());
-                            if (!ObjectUtils.isNullOrEmpty(tempPlayerList)) {
-                                playerList.addAll(tempPlayerList);
-                            }
                             //播列表参数（列表序号、开始时间、结束时间）
                             objectJson = getValueByKey("playTimeInfo", tempFileContents);
-                            PlayerTimeList playerTime = JsonUtil.fromJson(objectJson, PlayerTimeList.class);
+                            PlayerBean.PlayTimeInfo playerTime = JsonUtil.fromJson(objectJson, PlayerBean.PlayTimeInfo.class);
+                            if (null == playerTime) return;
                             if (!ObjectUtils.isNullOrEmpty(playerTime)) {
                                 playerTime.setBeginTime(DateUtil.timeFormat(playerTime.getBeginTime()));
-                                playerTime.setEndTime(DateUtil.timeFormat(playerTime.getEndTime()));
-                                playTimeList.add(playerTime);
                             }
+                            if (null == playerTime.getBeginTime()) return;
+                            long _time = DateUtils.formatToLongTime(playerTime.getBeginTime()) / 1000;
+                            SharedPreferencesHelper.getInstance(_context).put(String.valueOf(_time), tempFileContents);
 //                            tempFile.delete();//指令文件解析后直接删除
                         }
                     }
                 }
-                Collections.sort(playerList);
-                Collections.sort(playTimeList);
-                resultMap.put("playerList", playerList);
-                resultMap.put("playTimeList", playTimeList);
-                return resultMap;
             }
         } catch (Exception e) {
-            resultMap = new HashMap<String, List>();
             e.printStackTrace();
         }
-        return resultMap;
+    }
+
+    /**
+     * 解析播放列表指令，根据文件的开始时间，获取的播放列表解析
+     *
+     * @param _jsonString Json文件
+     * @return Map playTimeList-播放时间表  playerList-播放文件列表
+     */
+    public static PlayerBean getReadyPlayerFileList(String _jsonString) {
+        PlayerBean _playerBean = null;
+        try {
+            if (ObjectUtils.isNullOrEmpty(_jsonString)) {
+                return _playerBean;
+            } else {
+                _playerBean = JsonUtil.fromJson(_jsonString, PlayerBean.class);
+                Collections.sort(_playerBean.getList());
+                return _playerBean;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return _playerBean;
     }
 
     /**
