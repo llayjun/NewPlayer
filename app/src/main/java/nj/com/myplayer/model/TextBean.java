@@ -6,12 +6,6 @@ package nj.com.myplayer.model;
  */
 public class TextBean extends BasicBean {
 
-    public static final String TEXT_POSTION = "upper";//文字位置
-
-    public static final String TEXT_COLOR = "first";//文字颜色
-
-    public static final String TEXT_SIZE = "text-big";//文字的大小
-
     private int rollTimes;//播放次数
 
     private String position;  //弹幕位置

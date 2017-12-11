@@ -4,18 +4,17 @@ package nj.com.myplayer.common;
 import android.content.Context;
 
 import com.millet.androidlib.Utils.DateUtils;
-import com.millet.androidlib.Utils.SharedPreferencesHelper;
 
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.TextBean;
 import nj.com.myplayer.utils.DateUtil;
+import nj.com.myplayer.utils.SPPlayerHelper;
+import nj.com.myplayer.utils.SPRollHelper;
 
 
 /**
@@ -33,45 +32,45 @@ public class FileAnalyzeUtil {
     public static final String PLAYER_LIST = "playerList";//播放列表
     public static final String PLAY_TIME_LIST = "playTimeList";//播放列表时间
 
-    /**
-     * 解析弹幕指令
-     *
-     * @param filePath 文件路径
-     * @return List
-     */
-    public static List<TextBean> getTextList(String filePath) {
-        List<TextBean> resultList = new ArrayList<TextBean>();
-        try {
-            File rootPath = new File(filePath);
-            File fileList[] = rootPath.listFiles();
-            if (ObjectUtils.isNullOrEmpty(fileList)) {
-                return resultList;
-            } else {
-                String tempFileName, tempFileContents, instructFileType;
-                for (File tempFile : fileList) {
-                    tempFileName = tempFile.getName();
-                    if (tempFileName.endsWith(END_TEXT)) {
-                        tempFileContents = FileReadUtil.getStringFromFile(tempFile);
-                        instructFileType = getValueByKey("instructFileType", tempFileContents);
-                        if (FLAG_TEXT.equals(instructFileType)) {
-                            TextBean textBean = JsonUtil.fromJson(tempFileContents, TextBean.class);
-                            if (!ObjectUtils.isNullOrEmpty(textBean)) {
-                                String currentTime = textBean.getTimeCheck(); //当前时间 时间校验加在此处
-                                resultList.add(textBean);
-//                                tempFile.delete();//指令文件解析后直接删除
-                            }
-                        }
-                    }
-                }
-                Collections.sort(resultList);
-                return resultList;
-            }
-        } catch (Exception e) {
-            resultList = new ArrayList<TextBean>();
-            e.printStackTrace();
-        }
-        return resultList;
-    }
+//    /**
+//     * 解析弹幕指令
+//     *
+//     * @param filePath 文件路径
+//     * @return List
+//     */
+//    public static List<TextBean> getTextList(String filePath) {
+//        List<TextBean> resultList = new ArrayList<TextBean>();
+//        try {
+//            File rootPath = new File(filePath);
+//            File fileList[] = rootPath.listFiles();
+//            if (ObjectUtils.isNullOrEmpty(fileList)) {
+//                return resultList;
+//            } else {
+//                String tempFileName, tempFileContents, instructFileType;
+//                for (File tempFile : fileList) {
+//                    tempFileName = tempFile.getName();
+//                    if (tempFileName.endsWith(END_TEXT)) {
+//                        tempFileContents = FileReadUtil.getStringFromFile(tempFile);
+//                        instructFileType = getValueByKey("instructFileType", tempFileContents);
+//                        if (FLAG_TEXT.equals(instructFileType)) {
+//                            TextBean textBean = JsonUtil.fromJson(tempFileContents, TextBean.class);
+//                            if (!ObjectUtils.isNullOrEmpty(textBean)) {
+//                                String currentTime = textBean.getTimeCheck(); //当前时间 时间校验加在此处
+//                                resultList.add(textBean);
+////                                tempFile.delete();//指令文件解析后直接删除
+//                            }
+//                        }
+//                    }
+//                }
+//                Collections.sort(resultList);
+//                return resultList;
+//            }
+//        } catch (Exception e) {
+//            resultList = new ArrayList<TextBean>();
+//            e.printStackTrace();
+//        }
+//        return resultList;
+//    }
 
 //    /**
 //     * 解析播放列表指令
@@ -129,6 +128,64 @@ public class FileAnalyzeUtil {
 //    }
 
     /**
+     * 解析弹幕指令，根据文件的开始时间存储到sp中
+     *
+     * @param filePath 文件路径
+     * @return List
+     */
+    public static void saveRollTextInfo2Shared(Context _context, String filePath) {
+        try {
+            File rootPath = new File(filePath);
+            File fileList[] = rootPath.listFiles();
+            if (ObjectUtils.isNullOrEmpty(fileList)) {
+                return;
+            } else {
+                String tempFileName, tempFileContents, instructFileType;
+                for (File tempFile : fileList) {
+                    tempFileName = tempFile.getName();
+                    if (tempFileName.endsWith(END_TEXT)) {
+                        tempFileContents = FileReadUtil.getStringFromFile(tempFile);
+                        instructFileType = getValueByKey("instructFileType", tempFileContents);
+                        if (FLAG_TEXT.equals(instructFileType)) {
+                            TextBean textBean = JsonUtil.fromJson(tempFileContents, TextBean.class);
+                            if (null == textBean) return;
+                            if (!ObjectUtils.isNullOrEmpty(textBean)) {
+                                textBean.setTextBeginTime(DateUtil.timeFormat(textBean.getTextBeginTime()));
+                                if (null == textBean.getTextBeginTime()) return;
+                                long _time = DateUtils.formatToLongTime(textBean.getTextBeginTime()) / 1000;
+                                SPRollHelper.getInstance().put(String.valueOf(_time), tempFileContents);
+//                                tempFile.delete();//指令文件解析后直接删除
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 解析弹幕指令，根据文件的开始时间，获取的弹幕解析
+     *
+     * @param _jsonString Json文件
+     */
+    public static TextBean getReadyText(String _jsonString) {
+        TextBean _textBean = null;
+        try {
+            if (ObjectUtils.isNullOrEmpty(_jsonString)) {
+                return null;
+            } else {
+                _textBean = JsonUtil.fromJson(_jsonString, TextBean.class);
+                return _textBean;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * 解析播放列表指令，根据文件的开始时间存储到sp中
      *
      * @param filePath 文件路径
@@ -156,7 +213,7 @@ public class FileAnalyzeUtil {
                             }
                             if (null == playerTime.getBeginTime()) return;
                             long _time = DateUtils.formatToLongTime(playerTime.getBeginTime()) / 1000;
-                            SharedPreferencesHelper.getInstance(Constant.PLAYER_NAME, _context).put(String.valueOf(_time), tempFileContents);
+                            SPPlayerHelper.getInstance().put(String.valueOf(_time), tempFileContents);
 //                            tempFile.delete();//指令文件解析后直接删除
                         }
                     }
@@ -177,16 +234,17 @@ public class FileAnalyzeUtil {
         PlayerBean _playerBean = null;
         try {
             if (ObjectUtils.isNullOrEmpty(_jsonString)) {
-                return _playerBean;
+                return null;
             } else {
                 _playerBean = JsonUtil.fromJson(_jsonString, PlayerBean.class);
+                if (null == _playerBean) return null;
                 Collections.sort(_playerBean.getList());
                 return _playerBean;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return _playerBean;
     }
 
     /**

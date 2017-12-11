@@ -1,4 +1,4 @@
-package com.millet.androidlib.Utils;
+package nj.com.myplayer.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,28 +11,28 @@ import java.util.Map;
  * Created by Administrator on 2017/9/11 0011.
  */
 
-public class SharedPreferencesHelper {
+public class SPRollHelper {
     /**
      * 保存在手机里面的名字
      */
-    public static final String FILE_NAME = "shared_data";
+    public static final String FILE_NAME = nj.com.myplayer.common.Constant.TEXT_NAME;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
 
-    private static SharedPreferencesHelper mInstance;
+    private static SPRollHelper mInstance;
 
-    private SharedPreferencesHelper() {
+    private SPRollHelper() {
     }
 
-    private SharedPreferencesHelper(String _fileName, Context context) {
+    private SPRollHelper(String _fileName, Context context) {
         sharedPreferences = context.getSharedPreferences(_fileName, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 
-    public static SharedPreferencesHelper getInstance() {
+    public static SPRollHelper getInstance() {
         if (null == mInstance)
-            mInstance = new SharedPreferencesHelper(FILE_NAME, BaseApplication.getInstance());
+            mInstance = new SPRollHelper(FILE_NAME, BaseApplication.getInstance());
         return mInstance;
     }
 
