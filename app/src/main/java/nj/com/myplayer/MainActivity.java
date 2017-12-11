@@ -200,7 +200,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 case MSG_TIME:
                     mTime.setText(msg.obj.toString());
                     long _currentTime = System.currentTimeMillis() / 1000;
-                    Map<String, ?> _stringMap = SharedPreferencesHelper.getInstance(MainActivity.this).getAll();
+                    Map<String, ?> _stringMap = SharedPreferencesHelper.getInstance(Constant.PLAYER_NAME, MainActivity.this).getAll();
                     if (_stringMap.containsKey(String.valueOf(_currentTime))) {
                         String _playJsonString = (String) _stringMap.get(String.valueOf(_currentTime));
                         PlayerBean _playerBean = FileAnalyzeUtil.getReadyPlayerFileList(_playJsonString);

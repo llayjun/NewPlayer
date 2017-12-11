@@ -25,14 +25,14 @@ public class SharedPreferencesHelper {
     private SharedPreferencesHelper() {
     }
 
-    private SharedPreferencesHelper(Context context) {
-        sharedPreferences = context.getSharedPreferences(FILE_NAME, Context.MODE_PRIVATE);
+    private SharedPreferencesHelper(String _fileName, Context context) {
+        sharedPreferences = context.getSharedPreferences(_fileName, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
     }
 
-    public static SharedPreferencesHelper getInstance(Context _context) {
+    public static SharedPreferencesHelper getInstance(String _fileName, Context _context) {
         if (null == mInstance)
-            mInstance = new SharedPreferencesHelper(BaseApplication.getInstance());
+            mInstance = new SharedPreferencesHelper(_fileName, BaseApplication.getInstance());
         return mInstance;
     }
 

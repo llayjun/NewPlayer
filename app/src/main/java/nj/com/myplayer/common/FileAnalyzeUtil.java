@@ -156,7 +156,7 @@ public class FileAnalyzeUtil {
                             }
                             if (null == playerTime.getBeginTime()) return;
                             long _time = DateUtils.formatToLongTime(playerTime.getBeginTime()) / 1000;
-                            SharedPreferencesHelper.getInstance(_context).put(String.valueOf(_time), tempFileContents);
+                            SharedPreferencesHelper.getInstance(Constant.PLAYER_NAME, _context).put(String.valueOf(_time), tempFileContents);
 //                            tempFile.delete();//指令文件解析后直接删除
                         }
                     }
