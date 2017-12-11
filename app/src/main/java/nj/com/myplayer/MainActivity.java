@@ -95,8 +95,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         //设置当前窗体为全屏显示
         window.setFlags(flag, flag);
         Vitamio.initialize(this);
-        FileAnalyzeUtil.savePlayInfo2Shared(this, mFile.getPath());
-        FileAnalyzeUtil.saveRollTextInfo2Shared(this, mFile.getPath());
+        if (mFile.exists()) {
+            FileAnalyzeUtil.savePlayInfo2Shared(this, mFile.getPath());
+            FileAnalyzeUtil.saveRollTextInfo2Shared(this, mFile.getPath());
+        }
     }
 
     @Override
@@ -141,7 +143,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      */
     private void playMedia() {
         if (mIndex >= mNowPlayInfoList.size() || mNowPlayInfoList.size() <= 0) {
-            GlideUtils.loadImageView(this, a, mImageView);
+            GlideUtils.loadImageView(this, R.mipmap.a, mImageView);
             mImageView.setVisibility(View.VISIBLE);
             mVideoView.setVisibility(View.GONE);
             return;
@@ -402,7 +404,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
             @Override
             public void onStatePowerDisconnected() {
-                GlideUtils.loadImageView(MainActivity.this, a, mScreenImage);
+                GlideUtils.loadImageView(MainActivity.this, R.mipmap.b, mScreenImage);
                 mScreenImage.setVisibility(View.VISIBLE);
                 mVideoView.setVolume(0f, 0f);
             }
