@@ -1,5 +1,6 @@
 package nj.com.myplayer;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,7 +8,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,11 +42,11 @@ import nj.com.myplayer.listener.BatteryListener;
 import nj.com.myplayer.listener.BatteryStateListener;
 import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.TextBean;
+import nj.com.myplayer.service.LocalService;
+import nj.com.myplayer.service.RemoteService;
 import nj.com.myplayer.utils.DateUtil;
 import nj.com.myplayer.utils.SPPlayerHelper;
 import nj.com.myplayer.utils.SPRollHelper;
-
-import static nj.com.myplayer.R.mipmap.a;
 
 public class MainActivity extends BaseActivity implements MediaPlayer.OnCompletionListener, Runnable {
 
@@ -88,12 +88,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
     @Override
     protected void initData(Bundle savedInstanceState) {
-        //定义全屏参数
-        int flag = WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        //获得当前窗体对象
-        Window window = this.getWindow();
-        //设置当前窗体为全屏显示
-        window.setFlags(flag, flag);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Vitamio.initialize(this);
         if (mFile.exists()) {
             FileAnalyzeUtil.savePlayInfo2Shared(this, mFile.getPath());
@@ -104,6 +100,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
+        startService(new Intent(this, LocalService.class));
+        startService(new Intent(this, RemoteService.class));
         if (!io.vov.vitamio.LibsChecker.checkVitamioLibs(this))
             return;
         initTime();
