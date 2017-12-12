@@ -133,7 +133,7 @@ public class FileAnalyzeUtil {
      * @param filePath 文件路径
      * @return List
      */
-    public static void saveRollTextInfo2Shared(Context _context, String filePath) {
+    public static void saveRollTextInfo2Shared(String filePath) {
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
@@ -190,7 +190,7 @@ public class FileAnalyzeUtil {
      *
      * @param filePath 文件路径
      */
-    public static void savePlayInfo2Shared(Context _context, String filePath) {
+    public static void savePlayInfo2Shared(String filePath) {
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();

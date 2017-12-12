@@ -7,10 +7,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.millet.androidlib.Base.BaseActivity;
 import com.millet.androidlib.Utils.DateUtils;
@@ -24,6 +26,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
@@ -92,8 +96,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Vitamio.initialize(this);
         if (mFile.exists()) {
-            FileAnalyzeUtil.savePlayInfo2Shared(this, mFile.getPath());
-            FileAnalyzeUtil.saveRollTextInfo2Shared(this, mFile.getPath());
+            SPPlayerHelper.getInstance().clear();
+            SPRollHelper.getInstance().clear();
+            FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
+            FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
         }
     }
 
@@ -445,6 +451,37 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
             // dont forget release!
             mIDanmakuView.release();
             mIDanmakuView = null;
+        }
+    }
+
+    private static Boolean isESC = false;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            exitBy2Click();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
+     * 双击退出函数
+     */
+    private void exitBy2Click() {
+        Timer tExit;
+        if (!isESC) {
+            isESC = true; // 准备退出
+            Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+            tExit = new Timer();
+            tExit.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    isESC = false; // 取消退出
+                }
+            }, 2000); // 如果2秒钟内没有按下返回键，则启动定时器取消掉刚才执行的任务
+        } else {
+            moveTaskToBack(false);
         }
     }
 
