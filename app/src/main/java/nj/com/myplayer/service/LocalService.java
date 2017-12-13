@@ -4,12 +4,14 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
 import nj.com.myplayer.IMyAidlInterface;
+import nj.com.myplayer.broadcast.TimeBroadcastReceiver;
 
 /**
  * Created by Administrator on 2017/12/12 0012.
@@ -21,7 +23,7 @@ public class LocalService extends Service {
 
     private MyServiceConnection mMyServiceConnection;
 
-//    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
+    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
 
     @Override
     public void onCreate() {
@@ -30,7 +32,7 @@ public class LocalService extends Service {
             mMyBinder = new MyBinder();
         }
         mMyServiceConnection = new MyServiceConnection();
-//        registBroadcast();
+        registBroadcast();
     }
 
     @Override
@@ -78,15 +80,15 @@ public class LocalService extends Service {
 
     @Override
     public void onDestroy() {
-//        unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
     }
 
-//    public void registBroadcast() {
-//        IntentFilter filter = new IntentFilter();
-//        filter.setPriority(1000);
-//        filter.addAction(Intent.ACTION_TIME_TICK);
-//        registerReceiver(mBroadcastReceiver, filter);
-//    }
+    public void registBroadcast() {
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(1000);
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(mBroadcastReceiver, filter);
+    }
 
 }

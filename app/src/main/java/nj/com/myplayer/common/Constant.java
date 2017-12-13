@@ -23,6 +23,6 @@ public class Constant {
     public static final String TEXT_COLOR_READ = "second";//红色
     //文字的大小
     public static final String TEXT_SIZE_BIG = "text-big";//大字号
-    public static final String TEXT_SIZE_SMALL = "text_small";//小字号
+    public static final String TEXT_SIZE_SMALL = "text-small";//小字号
 
 }

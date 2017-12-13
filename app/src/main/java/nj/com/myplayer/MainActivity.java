@@ -95,8 +95,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         Vitamio.initialize(this);
         if (mFile.exists()) {
             SPPlayerHelper.getInstance().clear();
-            SPRollHelper.getInstance().clear();
             FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
+            SPRollHelper.getInstance().clear();
             FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
         }
     }
@@ -373,9 +373,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      * @param _textBean
      */
     private void addDanmakuText(TextBean _textBean) {
+        //默认弹幕值
         boolean _isBottom = false;
-        int _color;
-        int _size;
+        int _color = getResources().getColor(R.color.color_ffffff);
+        int _size = 20;
         float _speed = 1.0f;
         String _rollType = _textBean.getPosition();//位置
         switch (_rollType) {
@@ -389,12 +390,32 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 break;
         }
         String _rollColor = _textBean.getFontColor();//颜色
+        switch (_rollColor) {
+            case Constant.TEXT_COLOR_WHITE:
+                _color = getResources().getColor(R.color.color_ffffff);
+                break;
+            case Constant.TEXT_COLOR_READ:
+                _color = getResources().getColor(R.color.color_cf2e25);
+                break;
+            default:
+                break;
+        }
         String _rollSize = _textBean.getFontSize();//大小
+        switch (_rollSize) {
+            case Constant.TEXT_SIZE_BIG:
+                _size = 40;
+                break;
+            case Constant.TEXT_SIZE_SMALL:
+                _size = 30;
+                break;
+            default:
+                break;
+        }
         String _stringText = _textBean.getContent();//内容
         if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 10) {
             _speed = _stringText.length() / 10;
         }
-        addDanmaku(_isBottom, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText, _speed);
+        addDanmaku(_isBottom, BaseDanmaku.TYPE_SCROLL_RL, _color, _size, _stringText, _speed);
     }
 
     /**
