@@ -78,9 +78,9 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
     //data
     //设置弹幕的最大显示行数
-    private HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
+    private HashMap<Integer, Integer> maxLinesPair;
     //设置是否禁止重叠
-    private HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
+    private HashMap<Integer, Boolean> overlappingEnablePair;
     private ImageHandler mImageHandler = new ImageHandler();
     private int mIndex = 0;//记录已经播放到第几个了
     //准备播放的列表
@@ -278,17 +278,18 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     private void initDanmu() {
         mIDanmakuView = (IDanmakuView) findViewById(R.id.video_danmu);
         mContext = DanmakuContext.create();
+        maxLinesPair = new HashMap<>();
+        overlappingEnablePair = new HashMap<>();
         maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
         // 设置是否禁止重叠
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
                 .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
-                .setScrollSpeedFactor(1.2f) //设置弹幕滚动速度系数,只对滚动弹幕有效
-                .setScaleTextSize(1.2f)
+                .setScrollSpeedFactor(2f) //设置弹幕滚动速度系数,只对滚动弹幕有效
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair)//设置防弹幕重叠，null为允许重叠
-                .setDanmakuMargin(40);
+        ;
         if (mIDanmakuView != null) {
             mBaseDanmakuParser = new BaseDanmakuParser() {
                 @Override
@@ -304,6 +305,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public void drawingFinished() {
+                    addDanmaku(true, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, "22552525");
                     //主线程
                     if (mShowingTimes > 1) {
                         addDanmakuText(mTextBean);
@@ -337,6 +339,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public boolean onViewClick(IDanmakuView view) {
+                    addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, "哈哈哈");
                     if (mVideoView.getVisibility() == View.VISIBLE) {
                         mMediaController.show();
                     } else {
@@ -361,7 +364,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         String _rollColor = _textBean.getFontColor();//颜色
         String _rollSize = _textBean.getFontSize();//大小
         String _stringText = _textBean.getContent();//内容
-        addDanmaku(BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText);
+        addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText);
     }
 
     /**
@@ -369,15 +372,16 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      * @param _content
      * @param _size
      */
-    private void addDanmaku(int _type, int _color, float _size, String _content) {
+    private void addDanmaku(boolean _bottom, int _type, int _color, float _size, String _content) {
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(_type);
         danmaku.textColor = _color;
         danmaku.textSize = TextUtils.sp2px(this, _size);
         danmaku.text = _content;
-        danmaku.padding = 100;
+        danmaku.padding = 0;
         danmaku.priority = 1;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.isLive = false;
         danmaku.setTime(mIDanmakuView.getCurrentTime());
+        mIDanmakuView.getConfig().alignBottom(_bottom);
         mIDanmakuView.addDanmaku(danmaku);
     }
 
