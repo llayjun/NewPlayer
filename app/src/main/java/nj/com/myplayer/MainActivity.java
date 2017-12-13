@@ -286,7 +286,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
         mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
                 .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
-                .setScrollSpeedFactor(2f) //设置弹幕滚动速度系数,只对滚动弹幕有效
                 .setMaximumLines(maxLinesPair) //设置最大显示行数
                 .preventOverlapping(overlappingEnablePair)//设置防弹幕重叠，null为允许重叠
         ;
@@ -305,7 +304,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public void drawingFinished() {
-                    addDanmaku(true, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, "22552525");
                     //主线程
                     if (mShowingTimes > 1) {
                         addDanmakuText(mTextBean);
@@ -339,7 +337,6 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public boolean onViewClick(IDanmakuView view) {
-                    addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, "哈哈哈");
                     if (mVideoView.getVisibility() == View.VISIBLE) {
                         mMediaController.show();
                     } else {
@@ -360,19 +357,26 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      * @param _textBean
      */
     private void addDanmakuText(TextBean _textBean) {
+        float _speed = 1.0f;
         String _rollType = _textBean.getPosition();//位置
         String _rollColor = _textBean.getFontColor();//颜色
         String _rollSize = _textBean.getFontSize();//大小
         String _stringText = _textBean.getContent();//内容
-        addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText);
+        if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 10) {
+            _speed = _stringText.length() / 10;
+        }
+        addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText, _speed);
     }
 
     /**
+     * @param _bottom
      * @param _type
-     * @param _content
+     * @param _color
      * @param _size
+     * @param _content
+     * @param _speed
      */
-    private void addDanmaku(boolean _bottom, int _type, int _color, float _size, String _content) {
+    private void addDanmaku(boolean _bottom, int _type, int _color, float _size, String _content, float _speed) {
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(_type);
         danmaku.textColor = _color;
         danmaku.textSize = TextUtils.sp2px(this, _size);
@@ -381,6 +385,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         danmaku.priority = 1;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.isLive = false;
         danmaku.setTime(mIDanmakuView.getCurrentTime());
+        mIDanmakuView.getConfig().setScrollSpeedFactor(_speed); //设置弹幕滚动速度系数,只对滚动弹幕有效，1f对应4s左右
         mIDanmakuView.getConfig().alignBottom(_bottom);
         mIDanmakuView.addDanmaku(danmaku);
     }
