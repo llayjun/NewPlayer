@@ -15,8 +15,14 @@ public class Constant {
     public static final String IMAGE = "image";//图片
 
     //text 弹幕常量
-    public static final String TEXT_POSTION = "upper";//文字位置
-    public static final String TEXT_COLOR = "first";//文字颜色
-    public static final String TEXT_SIZE = "text-big";//文字的大小
+    //文字位置
+    public static final String TEXT_POSTION_UPPER = "upper";//顶部
+    public static final String TEXT_POSTION_DOWN = "down";//底部
+    //文字颜色
+    public static final String TEXT_COLOR_WHITE = "first";//白色
+    public static final String TEXT_COLOR_READ = "second";//红色
+    //文字的大小
+    public static final String TEXT_SIZE_BIG = "text-big";//大字号
+    public static final String TEXT_SIZE_SMALL = "text_small";//小字号
 
 }

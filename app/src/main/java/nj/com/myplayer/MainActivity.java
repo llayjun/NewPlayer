@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.millet.androidlib.Base.BaseActivity;
+import com.millet.androidlib.Net.ExecutorManager;
 import com.millet.androidlib.Utils.DateUtils;
 import com.millet.androidlib.Utils.GlideUtils;
 import com.millet.androidlib.Utils.TextUtils;
@@ -54,9 +55,6 @@ import nj.com.myplayer.utils.SPRollHelper;
 
 public class MainActivity extends BaseActivity implements MediaPlayer.OnCompletionListener, Runnable {
 
-    private String url1 = "http://112.253.22.157/17/z/z/y/u/zzyuasjwufnqerzvyxgkuigrkcatxr/hc.yinyuetai.com/D046015255134077DDB3ACA0D7E68D45.flv";
-    private String url2 = "http://flashmedia.eastday.com/newdate/news/2016-11/shznews1125-19.mp4";
-    private String url3 = Environment.getExternalStorageDirectory() + "/a.mp4";
     private File mFile = new File(Environment.getExternalStorageDirectory(), "millet");
 
     //广播监听电量状态
@@ -208,45 +206,63 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                     break;
                 case MSG_TIME:
                     mTime.setText(msg.obj.toString());
-                    long _currentTime = System.currentTimeMillis() / 1000;
+                    final long _currentTime = System.currentTimeMillis() / 1000;
 
                     //字幕
-                    Map<String, ?> _textStringMap = SPRollHelper.getInstance().getAll();
+                    final Map<String, ?> _textStringMap = SPRollHelper.getInstance().getAll();
                     if (_textStringMap.containsKey(String.valueOf(_currentTime))) {
-                        String _textJsonString = (String) _textStringMap.get(String.valueOf(_currentTime));
-                        if (!android.text.TextUtils.isEmpty(_textJsonString)) {
-                            TextBean _textBean = FileAnalyzeUtil.getReadyText(_textJsonString);
-                            if (null != _textBean) {
-                                mTextBean = _textBean;
-                                mShowingTimes = _textBean.getRollTimes();//字幕播放次数
-                                addDanmakuText(_textBean);
+                        ExecutorManager.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                String _textJsonString = (String) _textStringMap.get(String.valueOf(_currentTime));
+                                if (!android.text.TextUtils.isEmpty(_textJsonString)) {
+                                    final TextBean _textBean = FileAnalyzeUtil.getReadyText(_textJsonString);
+                                    if (null != _textBean) {
+                                        mTextBean = _textBean;
+                                        mShowingTimes = _textBean.getRollTimes();//字幕播放次数
+                                        MainActivity.this.runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                addDanmakuText(_textBean);
+                                            }
+                                        });
+                                    }
+                                }
                             }
-                        }
-
+                        });
                     }
 
                     //播放器
-                    Map<String, ?> _stringMap = SPPlayerHelper.getInstance().getAll();
+                    final Map<String, ?> _stringMap = SPPlayerHelper.getInstance().getAll();
                     if (_stringMap.containsKey(String.valueOf(_currentTime))) {
-                        String _playJsonString = (String) _stringMap.get(String.valueOf(_currentTime));
-                        if (!android.text.TextUtils.isEmpty(_playJsonString)) {
-                            PlayerBean _playerBean = FileAnalyzeUtil.getReadyPlayerFileList(_playJsonString);
-                            if (null != _playerBean) {
-                                mNowPlayInfoList.clear();
-                                mNowPlayInfoList = _playerBean.getList();
-                                mPlayerTime = _playerBean.getPlayTimeInfo();
-                                mIndex = 0;
-                                mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                        ExecutorManager.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                String _playJsonString = (String) _stringMap.get(String.valueOf(_currentTime));
+                                if (!android.text.TextUtils.isEmpty(_playJsonString)) {
+                                    PlayerBean _playerBean = FileAnalyzeUtil.getReadyPlayerFileList(_playJsonString);
+                                    if (null != _playerBean) {
+                                        mNowPlayInfoList.clear();
+                                        mNowPlayInfoList = _playerBean.getList();
+                                        mPlayerTime = _playerBean.getPlayTimeInfo();
+                                        mIndex = 0;
+                                        mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                                    }
+                                }
                             }
-                        }
-
+                        });
                     }
                     if (null != mPlayerTime) {
                         String _playEndTime = mPlayerTime.getEndTime();
                         long _endPlayerTime = DateUtils.formatToLongTime(DateUtil.timeFormat(_playEndTime)) / 1000;
                         if (_currentTime == _endPlayerTime) {
-                            mNowPlayInfoList.clear();
-                            mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                            ExecutorManager.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mNowPlayInfoList.clear();
+                                    mImageHandler.sendEmptyMessage(ImageHandler.MSG_SEND);
+                                }
+                            });
                         }
                     }
                     break;
@@ -357,15 +373,28 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      * @param _textBean
      */
     private void addDanmakuText(TextBean _textBean) {
+        boolean _isBottom = false;
+        int _color;
+        int _size;
         float _speed = 1.0f;
         String _rollType = _textBean.getPosition();//位置
+        switch (_rollType) {
+            case Constant.TEXT_POSTION_UPPER:
+                _isBottom = false;
+                break;
+            case Constant.TEXT_POSTION_DOWN:
+                _isBottom = true;
+                break;
+            default:
+                break;
+        }
         String _rollColor = _textBean.getFontColor();//颜色
         String _rollSize = _textBean.getFontSize();//大小
         String _stringText = _textBean.getContent();//内容
         if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 10) {
             _speed = _stringText.length() / 10;
         }
-        addDanmaku(false, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText, _speed);
+        addDanmaku(_isBottom, BaseDanmaku.TYPE_SCROLL_RL, Color.WHITE, 20, _stringText, _speed);
     }
 
     /**
