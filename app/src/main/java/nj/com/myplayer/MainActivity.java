@@ -1,7 +1,6 @@
 package nj.com.myplayer;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -380,10 +379,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         float _speed = 1.0f;
         String _rollType = _textBean.getPosition();//位置
         switch (_rollType) {
-            case Constant.TEXT_POSTION_UPPER:
+            case Constant.TEXT_POSITION_MIDDLE:
                 _isBottom = false;
                 break;
-            case Constant.TEXT_POSTION_DOWN:
+            case Constant.TEXT_POSITION_LOWER:
                 _isBottom = true;
                 break;
             default:
@@ -403,10 +402,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         String _rollSize = _textBean.getFontSize();//大小
         switch (_rollSize) {
             case Constant.TEXT_SIZE_BIG:
-                _size = 40;
+                _size = Constant.TEXT_SIZE_BIG_B;
                 break;
             case Constant.TEXT_SIZE_SMALL:
-                _size = 30;
+                _size = Constant.TEXT_SIZE_SMALL_S;
                 break;
             default:
                 break;
