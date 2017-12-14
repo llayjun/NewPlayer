@@ -33,6 +33,17 @@ public class GlideUtils {
         Glide.with(mContext).load(path).into(mImageView);
     }
 
+    /**
+     * 根据地址加载，不可缓存（包括memory和disk）
+     *
+     * @param _context
+     * @param _path
+     * @param _imageView
+     */
+    public static void loadImamgeViewWithNoCache(Context _context, String _path, ImageView _imageView) {
+        Glide.with(_context).load(_path).skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE).into(_imageView);
+    }
+
     //加载图片
     public static void loadImageView(Context mContext, int _imageId, ImageView mImageView) {
         Glide.with(mContext).load(_imageId).into(mImageView);

@@ -144,7 +144,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
      */
     private void playMedia() {
         if (mIndex >= mNowPlayInfoList.size() || mNowPlayInfoList.size() <= 0) {
-            GlideUtils.loadImageView(this, R.mipmap.a, mImageView);
+            GlideUtils.loadImageView(this, R.mipmap.screen, mImageView);
             mImageView.setVisibility(View.VISIBLE);
             mVideoView.setVisibility(View.GONE);
             return;
@@ -164,7 +164,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 mImageView.setVisibility(View.GONE);
                 break;
             case Constant.IMAGE:
-                GlideUtils.loadImageView(this, _filePath, mImageView);
+                GlideUtils.loadImamgeViewWithNoCache(this, _filePath, mImageView);
                 mImageView.setVisibility(View.VISIBLE);
                 mVideoView.setVisibility(View.GONE);
                 long _playLength = Long.parseLong(mNowPlayInfoList.get(mIndex).getPlayLength());
@@ -466,7 +466,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
             @Override
             public void onStatePowerDisconnected() {
-                GlideUtils.loadImageView(MainActivity.this, R.mipmap.b, mScreenImage);
+                GlideUtils.loadImageView(MainActivity.this, R.mipmap.screen, mScreenImage);
                 mScreenImage.setVisibility(View.VISIBLE);
                 mVideoView.setVolume(0f, 0f);
             }
