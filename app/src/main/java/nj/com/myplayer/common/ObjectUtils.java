@@ -58,10 +58,4 @@ public final class ObjectUtils {
         return false;
     }
 
-    public static void main(String[] args) {
-
-
-    }
-
-
 }

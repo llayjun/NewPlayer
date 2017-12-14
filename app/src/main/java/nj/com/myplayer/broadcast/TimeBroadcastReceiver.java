@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Calendar;
 
 import nj.com.myplayer.common.FileAnalyzeUtil;
+import nj.com.myplayer.common.FileHandleUtil;
 import nj.com.myplayer.utils.SPPlayerHelper;
 import nj.com.myplayer.utils.SPRollHelper;
 
@@ -36,6 +37,7 @@ public class TimeBroadcastReceiver extends BroadcastReceiver {
                         FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
                         SPRollHelper.getInstance().clear();
                         FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
+                        FileHandleUtil.deleteLossFile(mFile.getPath());
                         Toast.makeText(_context, "零点写入成功", Toast.LENGTH_LONG).show();
                     }
                 }

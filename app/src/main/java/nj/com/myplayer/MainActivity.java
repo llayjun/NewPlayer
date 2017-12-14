@@ -42,6 +42,7 @@ import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import nj.com.myplayer.common.Constant;
 import nj.com.myplayer.common.FileAnalyzeUtil;
+import nj.com.myplayer.common.FileHandleUtil;
 import nj.com.myplayer.listener.BatteryListener;
 import nj.com.myplayer.listener.BatteryStateListener;
 import nj.com.myplayer.model.PlayerBean;
@@ -97,6 +98,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
             FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
             SPRollHelper.getInstance().clear();
             FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
+            FileHandleUtil.deleteLossFile(mFile.getPath());
         }
     }
 

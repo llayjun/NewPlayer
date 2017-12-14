@@ -1,8 +1,8 @@
 package nj.com.myplayer.common;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Set;
 
 /**
@@ -10,39 +10,32 @@ import java.util.Set;
  * Created by Administrator on 2017/11/28.
  */
 public class FileHandleUtil {
+
     /**
      * 删除文件夹下失去引用的文件
-     * 获取需要且文件下不存在的文件名
      *
-     * @param nameSet
-     * @param filePath
-     * @return 需要去WiFi接受文件夹cp的文件
+     * @param filePath 文件路径
      */
-    public static Set<String> deleteLossFile(Set<String> nameSet, String filePath) {
+    public static void deleteLossFile(String filePath) {
         try {
+            if (android.text.TextUtils.isEmpty(filePath)) return;
+            Set<String> fileNameSet = FileAnalyzeUtil.getPlayInfoList(filePath);
+            if (fileNameSet.size() == 0) return;
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
-            if (ObjectUtils.isNullOrEmpty(fileList)) {
-                return nameSet;
-            } else {
-                List<String> existFile = new ArrayList<String>(); //已存在的文件
-                String tempFileName; //文件名
+            if (!ObjectUtils.isNullOrEmpty(fileList)) {
+                String tempFileName; //文件名-临时变量
                 for (File tempFile : fileList) {
                     tempFileName = tempFile.getName();
-                    if (nameSet.contains(tempFileName)) {
-                        existFile.add(tempFileName);
-                    } else {
+                    //文件不需要播放且不是播放指令文件  此类文件删除
+                    if (!fileNameSet.contains(tempFileName) && !tempFileName.endsWith(FileAnalyzeUtil.END_PLAYER)) {
                         tempFile.delete();
                     }
                 }
-                nameSet.removeAll(existFile);
-                return nameSet;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
-
     }
 
     /**
