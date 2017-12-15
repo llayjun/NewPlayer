@@ -169,8 +169,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 GlideUtils.loadImamgeViewWithNoCache(this, _filePath, mImageView);
                 mImageView.setVisibility(View.VISIBLE);
                 mVideoView.setVisibility(View.GONE);
-                long _playLength = Long.parseLong(mNowPlayInfoList.get(mIndex).getPlayLength());
-                mImageHandler.sendEmptyMessageDelayed(ImageHandler.MSG_SEND, _playLength);
+                int _playLength = Integer.parseInt(mNowPlayInfoList.get(mIndex).getPlayLength());
+                mImageHandler.sendEmptyMessageDelayed(ImageHandler.MSG_SEND, 1000 * _playLength);
                 break;
         }
         mIndex += 1;
@@ -354,6 +354,10 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
 
                 @Override
                 public boolean onViewClick(IDanmakuView view) {
+//                    if (DateUtil.requestRootPermission(MainActivity.this, MainActivity.this.getPackageCodePath())) {
+//                        DateUtil.setTimeZone(MainActivity.this);
+//                        DateUtil.setTime("20111209.121212");
+//                    }
                     if (mVideoView.getVisibility() == View.VISIBLE) {
                         mMediaController.show();
                     } else {

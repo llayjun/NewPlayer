@@ -2,6 +2,7 @@ package nj.com.myplayer.utils;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.widget.Toast;
 
 import java.io.DataOutputStream;
 import java.text.DateFormat;
@@ -57,7 +58,7 @@ public class DateUtil {
      *
      * @return 应用程序是/否获取Root权限
      */
-    public static boolean requestRootPermission(String pkgCodePath) {
+    public static boolean requestRootPermission(Context _context, String pkgCodePath) {
         Process process = null;
         DataOutputStream os = null;
         try {
@@ -69,6 +70,7 @@ public class DateUtil {
             os.flush();
             process.waitFor();
         } catch (Exception e) {
+            Toast.makeText(_context, "权限不足", Toast.LENGTH_SHORT).show();
             return false;
         } finally {
             try {
@@ -87,7 +89,7 @@ public class DateUtil {
      *
      * @param _context
      */
-    public void setTimeZone(Context _context) {
+    public static void setTimeZone(Context _context) {
         AlarmManager mAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
         mAlarmManager.setTimeZone("GMT+09:00");
     }
