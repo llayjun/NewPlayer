@@ -45,7 +45,8 @@
 
         <receiver
             android:name=".broadcast.BootBroadcastReceiver"
-            android:exported="true">
+            android:exported="true"
+            android:priority="1000">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
 
@@ -53,10 +54,13 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".service.LocalService"/>
+        <service
+            android:name=".service.LocalService"
+            android:priority="1000"/>
 
         <service
             android:name=".service.RemoteService"
+            android:priority="1000"
             android:process=":remote"/>
 
     </application>
