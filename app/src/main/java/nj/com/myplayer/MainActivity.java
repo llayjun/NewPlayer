@@ -52,10 +52,11 @@ import nj.com.myplayer.service.RemoteService;
 import nj.com.myplayer.utils.DateUtil;
 import nj.com.myplayer.utils.SPPlayerHelper;
 import nj.com.myplayer.utils.SPRollHelper;
+import nj.com.myplayer.utils.ScreenUtil;
 
 public class MainActivity extends BaseActivity implements MediaPlayer.OnCompletionListener, Runnable {
 
-    private File mFile = new File(Environment.getExternalStorageDirectory(), "millet");
+    private File mFile = new File(Environment.getExternalStorageDirectory(), Constant.FILE_PATH);
 
     //广播监听电量状态
     private BatteryListener mBatteryListener;
@@ -92,6 +93,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
     protected void initData(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        ScreenUtil.hideBottomUIMenu(MainActivity.this);
         Vitamio.initialize(this);
         if (mFile.exists()) {
             SPPlayerHelper.getInstance().clear();
@@ -131,6 +133,7 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
         mMediaController = new MyMediaController(this, mVideoView, this);//实例化控制器
         mMediaController.show(5000);//控制器显示5s后自动隐藏
         mVideoView.setMediaController(mMediaController);//绑定控制器;
+        mVideoView.setVideoLayout(VideoView.VIDEO_LAYOUT_STRETCH, 0);
         mVideoView.setVideoQuality(MediaPlayer.VIDEOQUALITY_HIGH);//设置播放画质 高画质
         mVideoView.requestFocus();//取得焦点
         mVideoView.setOnCompletionListener(this);

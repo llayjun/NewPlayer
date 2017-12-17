@@ -9,6 +9,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.util.Calendar;
 
+import nj.com.myplayer.common.Constant;
 import nj.com.myplayer.common.FileAnalyzeUtil;
 import nj.com.myplayer.common.FileHandleUtil;
 import nj.com.myplayer.utils.SPPlayerHelper;
@@ -21,7 +22,7 @@ import nj.com.myplayer.utils.SPRollHelper;
 
 public class TimeBroadcastReceiver extends BroadcastReceiver {
 
-    private File mFile = new File(Environment.getExternalStorageDirectory(), "millet");
+    private File mFile = new File(Environment.getExternalStorageDirectory(), Constant.FILE_PATH);
 
     @Override
     public void onReceive(Context _context, Intent _intent) {

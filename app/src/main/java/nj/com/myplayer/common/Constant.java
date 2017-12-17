@@ -6,6 +6,9 @@ package nj.com.myplayer.common;
 
 public class Constant {
 
+    //存放文件地址
+    public static final String FILE_PATH = "millet";
+
     //SHAREDP存储名
     public static final String PLAYER_NAME = "player_name";
     public static final String TEXT_NAME = "text_name";
