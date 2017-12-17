@@ -420,8 +420,8 @@ public class MainActivity extends BaseActivity implements MediaPlayer.OnCompleti
                 break;
         }
         String _stringText = _textBean.getContent();//内容
-        if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 10) {
-            _speed = _stringText.length() / 10;
+        if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 5) {
+            _speed = _stringText.length() / 5;
         }
         addDanmaku(_isBottom, BaseDanmaku.TYPE_SCROLL_RL, _color, _size, _stringText, _speed);
     }
