@@ -1,10 +1,15 @@
 package nj.com.myplayer;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -56,6 +61,8 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
 
     private File mFile = new File(Environment.getExternalStorageDirectory(), Constant.FILE_PATH);
 
+    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;//动态获取权限
+
     //广播监听电量状态
     private BatteryListener mBatteryListener;
     //UI
@@ -92,15 +99,35 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             ScreenUtil.hideBottomUIMenu(MainActivity.this);
-            if (mFile.exists()) {
-                SPPlayerHelper.getInstance().clear();
-                FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
-                SPRollHelper.getInstance().clear();
-                FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
-                FileHandleUtil.deleteLossFile(mFile.getPath());
+            if (Build.VERSION.SDK_INT > 23) {
+                if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+                } else {
+                    if (mFile.exists()) {
+                        SPPlayerHelper.getInstance().clear();
+                        FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
+                        SPRollHelper.getInstance().clear();
+                        FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
+                        FileHandleUtil.deleteLossFile(mFile.getPath());
+                    }
+                }
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the task you need to do.
+                } else {
+                    ToastUtils.showToast(MainActivity.this, "请打开读取文件权限", Toast.LENGTH_LONG);
+                }
+            }
         }
     }
 
