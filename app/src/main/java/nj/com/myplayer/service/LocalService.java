@@ -23,7 +23,7 @@ public class LocalService extends Service {
 
     private MyServiceConnection mMyServiceConnection;
 
-    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
+//    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
 
     @Override
     public void onCreate() {
@@ -32,7 +32,7 @@ public class LocalService extends Service {
             mMyBinder = new MyBinder();
         }
         mMyServiceConnection = new MyServiceConnection();
-        registBroadcast();
+//        registBroadcast();
     }
 
     @Override
@@ -80,15 +80,15 @@ public class LocalService extends Service {
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(mBroadcastReceiver);
+//        unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
     }
 
-    public void registBroadcast() {
-        IntentFilter filter = new IntentFilter();
-        filter.setPriority(1000);
-        filter.addAction(Intent.ACTION_TIME_TICK);
-        registerReceiver(mBroadcastReceiver, filter);
-    }
+//    public void registBroadcast() {
+//        IntentFilter filter = new IntentFilter();
+//        filter.setPriority(1000);
+//        filter.addAction(Intent.ACTION_TIME_TICK);
+//        registerReceiver(mBroadcastReceiver, filter);
+//    }
 
 }
