@@ -104,17 +104,22 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                         && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 } else {
-                    if (mFile.exists()) {
-                        SPPlayerHelper.getInstance().clear();
-                        FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
-                        SPRollHelper.getInstance().clear();
-                        FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
-                        FileHandleUtil.deleteLossFile(mFile.getPath());
-                    }
+                    loadFile();
                 }
+            }else {
+                loadFile();
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
+        }
+    }
+
+    public void loadFile(){
+        if (mFile.exists()) {
+            SPPlayerHelper.getInstance().clear();
+            FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
+            SPRollHelper.getInstance().clear();
+            FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
         }
     }
 
@@ -124,6 +129,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the task you need to do.
+                    loadFile();
                 } else {
                     ToastUtils.showToast(MainActivity.this, "请打开读取文件权限", Toast.LENGTH_LONG);
                 }
@@ -615,13 +621,13 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     @Override
     protected void onDestroy() {
         try {
+            super.onDestroy();
             if (mBatteryListener != null) {
                 mBatteryListener.unregister();
             }
             if (null != mPlayerManager) {
                 mPlayerManager.onDestroy();
             }
-            super.onDestroy();
             if (mIDanmakuView != null) {
                 // dont forget release!
                 mIDanmakuView.release();
