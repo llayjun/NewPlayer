@@ -47,4 +47,6 @@ dependencies {
     compile 'com.github.ctiao:DanmakuFlameMaster:0.9.16'
     compile 'com.github.ctiao:ndkbitmap-armv7a:0.9.16'
     compile project(':androidlib')
+    //bugly
+    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.2.0
 }
