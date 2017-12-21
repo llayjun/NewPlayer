@@ -1,1 +1,1 @@
-include ':app', ':vitamios', ':androidlib'
+include ':app', ':androidlib'

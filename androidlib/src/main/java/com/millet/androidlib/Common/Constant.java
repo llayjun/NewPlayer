@@ -29,7 +29,7 @@ public class Constant {
         //存放在SD卡中文件名字
         public static final String CRASH_FILE_NAME = "crash";
         //存放在SD卡中文件后缀
-        public static final String CRASH_FILE_NAME_SUFFIX = ".trace";
+        public static final String CRASH_FILE_NAME_SUFFIX = ".txt";
     }
 
     /**

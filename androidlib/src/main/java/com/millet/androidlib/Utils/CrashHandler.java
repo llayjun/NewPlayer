@@ -93,7 +93,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
                 return;
             }
         }
-        File _dir = new File(Environment.getExternalStorageDirectory(), Constant.CrashHandler.CRASH_FILE_NAME);
+        File _dir = SDCardUtils.createSubDir(Constant.CrashHandler.CRASH_FILE_NAME);
         if (!_dir.exists()) {
             _dir.mkdirs();
         }
