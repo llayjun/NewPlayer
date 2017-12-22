@@ -351,6 +351,18 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     }
 
+    /**
+     * 设置音量
+     *
+     * @param _a
+     * @param _b
+     */
+    public void setVolume(float _a, float _b) {
+        if (null != mMediaPlayer) {
+            mMediaPlayer.setVolume(_a, _b);
+        }
+    }
+
     public void setMediaController(IMediaController controller) {
         if (mMediaController != null) {
             mMediaController.hide();

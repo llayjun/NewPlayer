@@ -573,13 +573,13 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                 @Override
                 public void onStatePowerConnected() {
                     mScreenImage.setVisibility(View.GONE);
-                    mPlayerManager.setVolume(1f);
+                    mPlayerManager.setVolumeSilence(1f, 1f);
                 }
 
                 @Override
                 public void onStatePowerDisconnected() {
                     mScreenImage.setVisibility(View.VISIBLE);
-                    mPlayerManager.setVolume(0f);
+                    mPlayerManager.setVolumeSilence(0f, 0f);
                 }
             });
         } catch (Exception _e) {

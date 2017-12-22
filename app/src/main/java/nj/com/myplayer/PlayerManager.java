@@ -346,6 +346,18 @@ public class PlayerManager {
         DebugLog.d(TAG, "onVolumeSlide:" + s);
     }
 
+    /**
+     * 设置静音
+     *
+     * @param _a
+     * @param _b
+     */
+    public void setVolumeSilence(float _a, float _b) {
+        if (null != videoView) {
+            videoView.setVolume(_a, _b);
+        }
+    }
+
     private void onProgressSlide(float percent) {
         long position = videoView.getCurrentPosition();
         long duration = videoView.getDuration();
