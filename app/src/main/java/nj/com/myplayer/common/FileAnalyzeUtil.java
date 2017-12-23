@@ -1,9 +1,13 @@
 package nj.com.myplayer.common;
 
 
+import android.content.Context;
+import android.os.SystemClock;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.millet.androidlib.Utils.DateUtils;
+import com.millet.androidlib.Utils.ToastUtils;
 
 import org.json.JSONObject;
 
@@ -135,7 +139,7 @@ public class FileAnalyzeUtil {
      * @param filePath 文件路径
      * @return List
      */
-    public static void saveRollTextInfo2Shared(String filePath) {
+    public static void saveRollTextInfo2Shared(Context _context, String filePath) {
         try {
             File rootPath = new File(filePath);
             File fileList[] = rootPath.listFiles();
@@ -152,11 +156,23 @@ public class FileAnalyzeUtil {
                             TextBean textBean = JsonUtil.fromJson(tempFileContents, TextBean.class);
                             if (null == textBean) return;
                             if (!ObjectUtils.isNullOrEmpty(textBean)) {
+                                String _checkTime = textBean.getTimeCheck();
+                                if (!TextUtils.isEmpty(_checkTime)) {
+                                    long _checkTimeLong = DateUtils.formatToLongTime(_checkTime);
+                                    boolean _b = SystemClock.setCurrentTimeMillis(_checkTimeLong);
+                                    if (_b) {
+                                        ToastUtils.showToast(_context, "矫正系统时间成功", Toast.LENGTH_LONG);
+                                    }
+                                    tempFile.delete();//删除这个矫正时间的roll文件
+                                    continue;
+                                }
                                 textBean.setTextBeginTime(DateUtil.timeFormat(textBean.getTextBeginTime()));
                                 if (null == textBean.getTextBeginTime()) return;
-                                long _time = DateUtils.formatToLongTime(textBean.getTextBeginTime()) / 1000;
-                                SPRollHelper.getInstance().put(String.valueOf(_time), tempFileContents);
-//                                tempFile.delete();//指令文件解析后直接删除
+                                long _currentTime = System.currentTimeMillis() / 1000;
+                                long _rollTime = DateUtils.formatToLongTime(textBean.getTextBeginTime()) / 1000;
+                                if (_rollTime > _currentTime) {
+                                    SPRollHelper.getInstance().put(String.valueOf(_rollTime), tempFileContents);
+                                }
                             }
                         }
                     }
@@ -172,6 +188,7 @@ public class FileAnalyzeUtil {
      *
      * @param _jsonString Json文件
      */
+
     public static TextBean getReadyText(String _jsonString) {
         TextBean _textBean = null;
         try {
@@ -256,9 +273,11 @@ public class FileAnalyzeUtil {
                                 playerTime.setBeginTime(DateUtil.timeFormat(playerTime.getBeginTime()));
                             }
                             if (null == playerTime.getBeginTime()) return;
-                            long _time = DateUtils.formatToLongTime(playerTime.getBeginTime()) / 1000;
-                            SPPlayerHelper.getInstance().put(String.valueOf(_time), tempFileContents);
-//                            tempFile.delete();//指令文件解析后直接删除
+                            long _currentTime = System.currentTimeMillis() / 1000;
+                            long _beginTime = DateUtils.formatToLongTime(playerTime.getBeginTime()) / 1000;
+                            if (_beginTime > _currentTime) {
+                                SPPlayerHelper.getInstance().put(String.valueOf(_beginTime), tempFileContents);
+                            }
                         }
                     }
                 }

@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.SET_TIME"/>
     <uses-permission android:name="android.permission.SET_TIME_ZONE"/>
@@ -55,10 +56,10 @@
             android:name=".service.LocalService"
             android:priority="1000"/>
 
-        <service
-            android:name=".service.RemoteService"
-            android:priority="1000"
-            android:process=":remote"/>
+        <!--<service-->
+            <!--android:name=".service.RemoteService"-->
+            <!--android:priority="1000"-->
+            <!--android:process=":remote"/>-->
 
     </application>
 

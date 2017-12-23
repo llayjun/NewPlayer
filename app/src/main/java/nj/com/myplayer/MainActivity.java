@@ -50,7 +50,6 @@ import nj.com.myplayer.listener.BatteryStateListener;
 import nj.com.myplayer.model.PlayerBean;
 import nj.com.myplayer.model.TextBean;
 import nj.com.myplayer.service.LocalService;
-import nj.com.myplayer.service.RemoteService;
 import nj.com.myplayer.utils.DateUtil;
 import nj.com.myplayer.utils.SPPlayerHelper;
 import nj.com.myplayer.utils.SPRollHelper;
@@ -115,10 +114,8 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
 
     public void loadFile() {
         if (mFile.exists()) {
-            SPPlayerHelper.getInstance().clear();
             FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
-            SPRollHelper.getInstance().clear();
-            FileAnalyzeUtil.saveRollTextInfo2Shared(mFile.getPath());
+            FileAnalyzeUtil.saveRollTextInfo2Shared(this,mFile.getPath());
             ToastUtils.showToast(this, "文件扫描成功", Toast.LENGTH_LONG);
         }
     }
@@ -142,7 +139,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
         try {
             setContentView(R.layout.activity_main);
             startService(new Intent(this, LocalService.class));
-            startService(new Intent(this, RemoteService.class));
+//            startService(new Intent(this, RemoteService.class));
             initTime();
             initView();
             initDanmu();
@@ -453,10 +450,6 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
 
                     @Override
                     public boolean onViewClick(IDanmakuView view) {
-//                    if (DateUtil.requestRootPermission(MainActivity.this, MainActivity.this.getPackageCodePath())) {
-//                        DateUtil.setTimeZone(MainActivity.this);
-//                        DateUtil.setTime("20111209.121212");
-//                    }
                         return false;
                     }
                 });

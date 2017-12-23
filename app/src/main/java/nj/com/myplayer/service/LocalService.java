@@ -23,7 +23,7 @@ public class LocalService extends Service {
 
     private MyServiceConnection mMyServiceConnection;
 
-//    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
+    private TimeBroadcastReceiver mBroadcastReceiver = new TimeBroadcastReceiver();
 
     @Override
     public void onCreate() {
@@ -32,13 +32,13 @@ public class LocalService extends Service {
             mMyBinder = new MyBinder();
         }
         mMyServiceConnection = new MyServiceConnection();
-//        registBroadcast();
+        registBroadcast();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Intent _intent = new Intent(this, RemoteService.class);
-        this.bindService(_intent, mMyServiceConnection, Context.BIND_IMPORTANT);
+//        Intent _intent = new Intent(this, RemoteService.class);
+//        this.bindService(_intent, mMyServiceConnection, Context.BIND_IMPORTANT);
         return START_STICKY;
     }
 
@@ -71,24 +71,24 @@ public class LocalService extends Service {
         @Override
         public void onServiceDisconnected(ComponentName _componentName) {
             // 启动RemoteService
-            Intent _intent = new Intent(LocalService.this, RemoteService.class);
-            startService(_intent);
-            Intent _intent1 = new Intent(LocalService.this, RemoteService.class);
-            bindService(_intent1, mMyServiceConnection, Context.BIND_IMPORTANT);
+//            Intent _intent = new Intent(LocalService.this, RemoteService.class);
+//            startService(_intent);
+//            Intent _intent1 = new Intent(LocalService.this, RemoteService.class);
+//            bindService(_intent1, mMyServiceConnection, Context.BIND_IMPORTANT);
         }
     }
 
     @Override
     public void onDestroy() {
-//        unregisterReceiver(mBroadcastReceiver);
+        unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
     }
 
-//    public void registBroadcast() {
-//        IntentFilter filter = new IntentFilter();
-//        filter.setPriority(1000);
-//        filter.addAction(Intent.ACTION_TIME_TICK);
-//        registerReceiver(mBroadcastReceiver, filter);
-//    }
+    public void registBroadcast() {
+        IntentFilter filter = new IntentFilter();
+        filter.setPriority(1000);
+        filter.addAction(Intent.ACTION_TIME_TICK);
+        registerReceiver(mBroadcastReceiver, filter);
+    }
 
 }
