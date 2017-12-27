@@ -15,7 +15,7 @@ import nj.com.myplayer.utils.BuglyUtil;
 public class MyApplication extends BaseApplication {
 
     public static final String BUGLY_APPID = "e6497dc975";
-    public static final boolean BUGLY_DEBUG = true;//建议在测试阶段建议设置成true，发布时设置为false。
+    public static final boolean BUGLY_DEBUG = false;//建议在测试阶段建议设置成true，发布时设置为false。
 
     @Override
     public void onCreate() {
