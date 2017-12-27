@@ -7,7 +7,7 @@ package nj.com.myplayer.common;
 public class Constant {
 
     //存放文件地址
-    public static final String FILE_PATH = "millet";
+    public static final String FILE_PATH = "Download";
 
     //SHAREDP存储名
     public static final String PLAYER_NAME = "player_name";
