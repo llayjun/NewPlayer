@@ -6,6 +6,8 @@ package nj.com.myplayer.common;
 
 public class Constant {
 
+    //java -jar signapk.jar platform.x509.pem platform.pk8 old.apk new.apk
+
     //存放文件地址
     public static final String FILE_PATH = "Download";
 
