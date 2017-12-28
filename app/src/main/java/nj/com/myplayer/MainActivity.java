@@ -609,6 +609,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     protected void onResume() {
         try {
             super.onResume();
+            ScreenUtil.hideBottomUIMenu(MainActivity.this);
             if (null != mPlayerManager) {
                 mPlayerManager.onResume();
             }
