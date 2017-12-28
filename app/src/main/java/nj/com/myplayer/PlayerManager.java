@@ -68,6 +68,7 @@ public class PlayerManager {
     private final int STATUS_PLAYING = 2;
     private final int STATUS_PAUSE = 3;
     private final int STATUS_COMPLETED = 4;
+    private final int STATUS_PREPARED = 5;
 
     private final Activity activity;
     private final IjkVideoView videoView;
@@ -158,6 +159,12 @@ public class PlayerManager {
                 return true;
             }
         });
+        videoView.setOnPreparedListener(new IMediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(IMediaPlayer _iMediaPlayer) {
+                statusChange(STATUS_PREPARED);
+            }
+        });
         videoView.setOnInfoListener(new IMediaPlayer.OnInfoListener() {
             @Override
             public boolean onInfo(IMediaPlayer mp, int what, int extra) {
@@ -217,6 +224,11 @@ public class PlayerManager {
             DebugLog.d(TAG, "statusChange STATUS_PLAYING...");
             if (playerStateListener != null) {
                 playerStateListener.onPlay();
+            }
+        } else if (newStatus == STATUS_PREPARED){
+            DebugLog.d(TAG, "statusChange STATUS PREPARED...");
+            if (playerStateListener != null) {
+                playerStateListener.onPrepared();
             }
         }
     }
@@ -744,6 +756,8 @@ public class PlayerManager {
         void onLoading();
 
         void onPlay();
+
+        void onPrepared();
     }
 
     public interface OnErrorListener {

@@ -115,7 +115,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     public void loadFile() {
         if (mFile.exists()) {
             FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
-            FileAnalyzeUtil.saveRollTextInfo2Shared(this,mFile.getPath());
+            FileAnalyzeUtil.saveRollTextInfo2Shared(this, mFile.getPath());
             ToastUtils.showToast(this, "文件扫描成功", Toast.LENGTH_LONG);
         }
     }
@@ -239,6 +239,15 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
             return null;
+        }
+    }
+
+    @Override
+    public void onPrepared() {
+        if (mScreenImage.getVisibility() == View.VISIBLE) {
+            mPlayerManager.setVolumeSilence(0f, 0f);
+        } else {
+            mPlayerManager.setVolumeSilence(1f, 1f);
         }
     }
 
