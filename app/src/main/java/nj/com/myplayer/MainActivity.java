@@ -69,27 +69,37 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     //图片
     private ImageView mImageView;
     //danmmu
-    private BaseDanmakuParser mBaseDanmakuParser;//解析弹幕
-    private IDanmakuView mIDanmakuView;//弹幕view
-    private DanmakuContext mContext;
+    private BaseDanmakuParser mBaseDanmakuParserMiddle;//解析弹幕，中间
+    private IDanmakuView mIDanmakuViewMiddle;//弹幕view，中间
+    private DanmakuContext mContextMiddle;
+    private BaseDanmakuParser mBaseDanmakuParserLower;//解析弹幕，底部
+    private IDanmakuView mIDanmakuViewLower;//弹幕view，底部
+    private DanmakuContext mContextLower;
     //time
     private TextView mTime;
     //screen image
     private ImageView mScreenImage;
 
     //data
-    //设置弹幕的最大显示行数
-    private HashMap<Integer, Integer> maxLinesPair;
-    //设置是否禁止重叠
-    private HashMap<Integer, Boolean> overlappingEnablePair;
+    //设置弹幕的最大显示行数，设置是否禁止重叠，中间
+    private HashMap<Integer, Integer> maxLinesPairMiddle;
+    private HashMap<Integer, Boolean> overlappingEnablePairMiddle;
+    //设置弹幕的最大显示行数，设置是否禁止重叠，底部
+    private HashMap<Integer, Integer> maxLinesPairLower;
+    private HashMap<Integer, Boolean> overlappingEnablePairLower;
+
+    //播放的字幕，中间
+    private TextBean mTextBeanMiddle;//正在播放的文字，中间
+    private int mShowingTimesMiddle = 0;//播放次数，中间
+    //播放的字幕，底部
+    private TextBean mTextBeanLower;//正在播放的文字，底部
+    private int mShowingTimesLower = 0;//播放次数，底部
+
     private ImageHandler mImageHandler = new ImageHandler();
     private int mIndex = 0;//记录已经播放到第几个了
     //准备播放的列表
     private List<PlayerBean.PlayerInfo> mNowPlayInfoList = new ArrayList<>();
     private PlayerBean.PlayTimeInfo mPlayerTime;
-    //播放的字幕
-    private TextBean mTextBean;//正在播放的文字
-    private int mShowingTimes = 0;//播放次数
 
     @Override
     protected void initData(Bundle savedInstanceState) {
@@ -142,7 +152,8 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
 //            startService(new Intent(this, RemoteService.class));
             initTime();
             initView();
-            initDanmu();
+            initDanmuMiddle();
+            initDanmuLower();
             initBattery();
             playMedia();
         } catch (Exception _e) {
@@ -316,14 +327,33 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                                     if (!android.text.TextUtils.isEmpty(_textJsonString)) {
                                         final TextBean _textBean = FileAnalyzeUtil.getReadyText(_textJsonString);
                                         if (null != _textBean) {
-                                            mTextBean = _textBean;
-                                            mShowingTimes = _textBean.getRollTimes();//字幕播放次数
-                                            MainActivity.this.runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    addDanmakuText(_textBean);
-                                                }
-                                            });
+                                            String _rollType = _textBean.getPosition();//位置
+                                            switch (_rollType) {
+                                                case Constant.TEXT_POSITION_MIDDLE:
+                                                    mTextBeanMiddle = null;
+                                                    mTextBeanMiddle = _textBean;
+                                                    mShowingTimesMiddle = _textBean.getRollTimes();//字幕播放次数，中间
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            addDanmakuTextMiddle(_textBean);
+                                                        }
+                                                    });
+                                                    break;
+                                                case Constant.TEXT_POSITION_LOWER:
+                                                    mTextBeanLower = null;
+                                                    mTextBeanLower = _textBean;
+                                                    mShowingTimesLower = _textBean.getRollTimes();//字幕播放次数，底部
+                                                    MainActivity.this.runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            addDanmakuTextLower(_textBean);
+                                                        }
+                                                    });
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
                                         }
                                     }
                                 }
@@ -396,29 +426,33 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
         }
     }
 
-    private void initDanmu() {
+    /**
+     * 中间弹幕
+     */
+    private void initDanmuMiddle() {
         try {
-            mIDanmakuView = (IDanmakuView) findViewById(R.id.video_danmu);
-            mContext = DanmakuContext.create();
-            maxLinesPair = new HashMap<>();
-            overlappingEnablePair = new HashMap<>();
-            maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
+            mIDanmakuViewMiddle = (IDanmakuView) findViewById(R.id.video_danmu_middle);
+            mContextMiddle = DanmakuContext.create();
+            maxLinesPairMiddle = new HashMap<>();
+            overlappingEnablePairMiddle = new HashMap<>();
+            maxLinesPairMiddle.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
             // 设置是否禁止重叠
-            overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
-            overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
-            mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
+            overlappingEnablePairMiddle.put(BaseDanmaku.TYPE_SCROLL_RL, true);
+            overlappingEnablePairMiddle.put(BaseDanmaku.TYPE_FIX_TOP, true);
+            mContextMiddle.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
                     .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
-                    .setMaximumLines(maxLinesPair) //设置最大显示行数
-                    .preventOverlapping(overlappingEnablePair)//设置防弹幕重叠，null为允许重叠
+                    .setMaximumLines(maxLinesPairMiddle) //设置最大显示行数
+                    .preventOverlapping(overlappingEnablePairMiddle)//设置防弹幕重叠，null为允许重叠
+                    .alignBottom(true)
             ;
-            if (mIDanmakuView != null) {
-                mBaseDanmakuParser = new BaseDanmakuParser() {
+            if (mIDanmakuViewMiddle != null) {
+                mBaseDanmakuParserMiddle = new BaseDanmakuParser() {
                     @Override
                     protected IDanmakus parse() {
                         return new Danmakus();
                     }
                 };
-                mIDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
+                mIDanmakuViewMiddle.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                     @Override
                     public void updateTimer(DanmakuTimer timer) {
                         //子线程
@@ -427,9 +461,9 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                     @Override
                     public void drawingFinished() {
                         //主线程
-                        if (mShowingTimes > 1) {
-                            addDanmakuText(mTextBean);
-                            mShowingTimes--;
+                        if (mShowingTimesMiddle > 1) {
+                            addDanmakuTextMiddle(mTextBeanMiddle);
+                            mShowingTimesMiddle--;
                         }
                     }
 
@@ -441,11 +475,11 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                     @Override
                     public void prepared() {
                         //子线程
-                        mIDanmakuView.start();
+                        mIDanmakuViewMiddle.start();
                     }
                 });
 
-                mIDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
+                mIDanmakuViewMiddle.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
 
                     @Override
                     public boolean onDanmakuClick(IDanmakus danmakus) {
@@ -462,9 +496,9 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                         return false;
                     }
                 });
-                mIDanmakuView.prepare(mBaseDanmakuParser, mContext);
-                mIDanmakuView.showFPS(false); //是否显示FPS
-                mIDanmakuView.enableDanmakuDrawingCache(true);
+                mIDanmakuViewMiddle.prepare(mBaseDanmakuParserMiddle, mContextMiddle);
+                mIDanmakuViewMiddle.showFPS(false); //是否显示FPS
+                mIDanmakuViewMiddle.enableDanmakuDrawingCache(true);
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
@@ -472,28 +506,95 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     }
 
     /**
-     * 播放弹幕
+     * 底部弹幕
+     */
+    private void initDanmuLower() {
+        try {
+            mIDanmakuViewLower = (IDanmakuView) findViewById(R.id.video_danmu_lower);
+            mContextLower = DanmakuContext.create();
+            maxLinesPairLower = new HashMap<>();
+            overlappingEnablePairLower = new HashMap<>();
+            maxLinesPairLower.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示3行
+            // 设置是否禁止重叠
+            overlappingEnablePairLower.put(BaseDanmaku.TYPE_SCROLL_RL, true);
+            overlappingEnablePairLower.put(BaseDanmaku.TYPE_FIX_TOP, true);
+            mContextLower.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_NONE) //设置描边样式
+                    .setDuplicateMergingEnabled(false)//是否启用合并重复弹幕
+                    .setMaximumLines(maxLinesPairLower) //设置最大显示行数
+                    .preventOverlapping(overlappingEnablePairLower)//设置防弹幕重叠，null为允许重叠
+                    .alignBottom(true)
+            ;
+            if (mIDanmakuViewLower != null) {
+                mBaseDanmakuParserLower = new BaseDanmakuParser() {
+                    @Override
+                    protected IDanmakus parse() {
+                        return new Danmakus();
+                    }
+                };
+                mIDanmakuViewLower.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
+                    @Override
+                    public void updateTimer(DanmakuTimer timer) {
+                        //子线程
+                    }
+
+                    @Override
+                    public void drawingFinished() {
+                        //主线程
+                        if (mShowingTimesLower > 1) {
+                            addDanmakuTextLower(mTextBeanLower);
+                            mShowingTimesLower--;
+                        }
+                    }
+
+                    @Override
+                    public void danmakuShown(BaseDanmaku danmaku) {
+                        //主线程
+                    }
+
+                    @Override
+                    public void prepared() {
+                        //子线程
+                        mIDanmakuViewLower.start();
+                    }
+                });
+
+                mIDanmakuViewLower.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
+
+                    @Override
+                    public boolean onDanmakuClick(IDanmakus danmakus) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onDanmakuLongClick(IDanmakus danmakus) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onViewClick(IDanmakuView view) {
+                        return false;
+                    }
+                });
+                mIDanmakuViewLower.prepare(mBaseDanmakuParserLower, mContextLower);
+                mIDanmakuViewLower.showFPS(false); //是否显示FPS
+                mIDanmakuViewLower.enableDanmakuDrawingCache(true);
+            }
+        } catch (Exception _e) {
+            LogUtils.catchInfo(_e.toString());
+        }
+    }
+
+    /**
+     * 播放弹幕，中间
      *
      * @param _textBean
      */
-    private void addDanmakuText(TextBean _textBean) {
+    private void addDanmakuTextMiddle(TextBean _textBean) {
         try {
             //默认弹幕值
-            boolean _isBottom = false;
             int _color = getResources().getColor(R.color.color_ffffff);
             int _size = 20;
             float _speed = 1.0f;
-            String _rollType = _textBean.getPosition();//位置
-            switch (_rollType) {
-                case Constant.TEXT_POSITION_MIDDLE:
-                    _isBottom = false;
-                    break;
-                case Constant.TEXT_POSITION_LOWER:
-                    _isBottom = true;
-                    break;
-                default:
-                    break;
-            }
             String _rollColor = _textBean.getFontColor();//颜色
             switch (_rollColor) {
                 case Constant.TEXT_COLOR_WHITE:
@@ -520,33 +621,98 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 8) {
                 _speed = _stringText.length() / 8;
             }
-            addDanmaku(_isBottom, BaseDanmaku.TYPE_SCROLL_RL, _color, _size, _stringText, _speed);
+            addDanmakuMiddle(BaseDanmaku.TYPE_SCROLL_RL, _color, _size, _stringText, _speed);
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
         }
     }
 
     /**
-     * @param _bottom
+     * 播放弹幕，底部
+     *
+     * @param _textBean
+     */
+    private void addDanmakuTextLower(TextBean _textBean) {
+        try {
+            //默认弹幕值
+            int _color = getResources().getColor(R.color.color_ffffff);
+            int _size = 20;
+            float _speed = 1.0f;
+            String _rollColor = _textBean.getFontColor();//颜色
+            switch (_rollColor) {
+                case Constant.TEXT_COLOR_WHITE:
+                    _color = getResources().getColor(R.color.color_ffffff);
+                    break;
+                case Constant.TEXT_COLOR_READ:
+                    _color = getResources().getColor(R.color.color_cf2e25);
+                    break;
+                default:
+                    break;
+            }
+            String _rollSize = _textBean.getFontSize();//大小
+            switch (_rollSize) {
+                case Constant.TEXT_SIZE_BIG:
+                    _size = Constant.TEXT_SIZE_BIG_B;
+                    break;
+                case Constant.TEXT_SIZE_SMALL:
+                    _size = Constant.TEXT_SIZE_SMALL_S;
+                    break;
+                default:
+                    break;
+            }
+            String _stringText = _textBean.getContent();//内容
+            if (!android.text.TextUtils.isEmpty(_stringText) && _stringText.length() > 8) {
+                _speed = _stringText.length() / 8;
+            }
+            addDanmakuLower(BaseDanmaku.TYPE_SCROLL_RL, _color, _size, _stringText, _speed);
+        } catch (Exception _e) {
+            LogUtils.catchInfo(_e.toString());
+        }
+    }
+
+    /**
      * @param _type
      * @param _color
      * @param _size
      * @param _content
      * @param _speed
      */
-    private void addDanmaku(boolean _bottom, int _type, int _color, float _size, String _content, float _speed) {
+    private void addDanmakuMiddle(int _type, int _color, float _size, String _content, float _speed) {
         try {
-            BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(_type);
+            BaseDanmaku danmaku = mContextMiddle.mDanmakuFactory.createDanmaku(_type);
             danmaku.textColor = _color;
             danmaku.textSize = TextUtils.sp2px(this, _size);
             danmaku.text = _content;
             danmaku.padding = 0;
             danmaku.priority = 1;  // 可能会被各种过滤器过滤并隐藏显示
             danmaku.isLive = false;
-            danmaku.setTime(mIDanmakuView.getCurrentTime());
-            mIDanmakuView.getConfig().setScrollSpeedFactor(_speed); //设置弹幕滚动速度系数,只对滚动弹幕有效，1f对应4s左右
-            mIDanmakuView.getConfig().alignBottom(_bottom);
-            mIDanmakuView.addDanmaku(danmaku);
+            danmaku.setTime(mIDanmakuViewMiddle.getCurrentTime());
+            mIDanmakuViewMiddle.getConfig().setScrollSpeedFactor(_speed); //设置弹幕滚动速度系数,只对滚动弹幕有效，1f对应4s左右
+            mIDanmakuViewMiddle.addDanmaku(danmaku);
+        } catch (Exception _e) {
+            LogUtils.catchInfo(_e.toString());
+        }
+    }
+
+    /**
+     * @param _type
+     * @param _color
+     * @param _size
+     * @param _content
+     * @param _speed
+     */
+    private void addDanmakuLower(int _type, int _color, float _size, String _content, float _speed) {
+        try {
+            BaseDanmaku danmaku = mContextLower.mDanmakuFactory.createDanmaku(_type);
+            danmaku.textColor = _color;
+            danmaku.textSize = TextUtils.sp2px(this, _size);
+            danmaku.text = _content;
+            danmaku.padding = 0;
+            danmaku.priority = 1;  // 可能会被各种过滤器过滤并隐藏显示
+            danmaku.isLive = false;
+            danmaku.setTime(mIDanmakuViewLower.getCurrentTime());
+            mIDanmakuViewLower.getConfig().setScrollSpeedFactor(_speed); //设置弹幕滚动速度系数,只对滚动弹幕有效，1f对应4s左右
+            mIDanmakuViewLower.addDanmaku(danmaku);
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
         }
@@ -597,8 +763,11 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             if (null != mPlayerManager) {
                 mPlayerManager.onPause();
             }
-            if (mIDanmakuView != null && mIDanmakuView.isPrepared()) {
-                mIDanmakuView.pause();
+            if (mIDanmakuViewMiddle != null && mIDanmakuViewMiddle.isPrepared()) {
+                mIDanmakuViewMiddle.pause();
+            }
+            if (mIDanmakuViewLower != null && mIDanmakuViewLower.isPrepared()) {
+                mIDanmakuViewLower.pause();
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
@@ -613,8 +782,11 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             if (null != mPlayerManager) {
                 mPlayerManager.onResume();
             }
-            if (mIDanmakuView != null && mIDanmakuView.isPrepared() && mIDanmakuView.isPaused()) {
-                mIDanmakuView.resume();
+            if (mIDanmakuViewMiddle != null && mIDanmakuViewMiddle.isPrepared() && mIDanmakuViewMiddle.isPaused()) {
+                mIDanmakuViewMiddle.resume();
+            }
+            if (mIDanmakuViewLower != null && mIDanmakuViewLower.isPrepared() && mIDanmakuViewLower.isPaused()) {
+                mIDanmakuViewLower.resume();
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
@@ -631,10 +803,15 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
             if (null != mPlayerManager) {
                 mPlayerManager.onDestroy();
             }
-            if (mIDanmakuView != null) {
+            if (mIDanmakuViewMiddle != null) {
                 // dont forget release!
-                mIDanmakuView.release();
-                mIDanmakuView = null;
+                mIDanmakuViewMiddle.release();
+                mIDanmakuViewMiddle = null;
+            }
+            if (mIDanmakuViewLower != null) {
+                // dont forget release!
+                mIDanmakuViewLower.release();
+                mIDanmakuViewLower = null;
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
@@ -645,10 +822,15 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
     public void onBackPressed() {
         try {
             super.onBackPressed();
-            if (mIDanmakuView != null) {
+            if (mIDanmakuViewMiddle != null) {
                 // dont forget release!
-                mIDanmakuView.release();
-                mIDanmakuView = null;
+                mIDanmakuViewMiddle.release();
+                mIDanmakuViewMiddle = null;
+            }
+            if (mIDanmakuViewLower != null) {
+                // dont forget release!
+                mIDanmakuViewLower.release();
+                mIDanmakuViewLower = null;
             }
         } catch (Exception _e) {
             LogUtils.catchInfo(_e.toString());
