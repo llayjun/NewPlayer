@@ -1,6 +1,7 @@
 package nj.com.myplayer.common;
 
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.os.SystemClock;
 import android.text.TextUtils;
@@ -158,6 +159,8 @@ public class FileAnalyzeUtil {
                             if (!ObjectUtils.isNullOrEmpty(textBean)) {
                                 String _checkTime = textBean.getTimeCheck();
                                 if (!TextUtils.isEmpty(_checkTime)) {
+                                    AlarmManager mAlarmManager = (AlarmManager) _context.getSystemService(Context.ALARM_SERVICE);
+                                    mAlarmManager.setTimeZone("Asia/Shanghai");
                                     long _checkTimeLong = DateUtils.formatToLongTime(_checkTime);
                                     boolean _b = SystemClock.setCurrentTimeMillis(_checkTimeLong);
                                     if (_b) {
