@@ -1,9 +1,13 @@
 package nj.com.myplayer.common;
 
+import android.content.Context;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Set;
+
+import nj.com.myplayer.utils.FileUtil;
 
 /**
  * 文件处理
@@ -16,7 +20,7 @@ public class FileHandleUtil {
      *
      * @param filePath 文件路径
      */
-    public static void deleteLossFile(String filePath) {
+    public static void deleteLossFile(Context _context, String filePath) {
         try {
             if (android.text.TextUtils.isEmpty(filePath)) return;
             Set<String> fileNameSet = FileAnalyzeUtil.getPlayInfoList(filePath);
@@ -29,7 +33,7 @@ public class FileHandleUtil {
                     tempFileName = tempFile.getName();
                     //文件不需要播放且不是播放指令文件  此类文件删除
                     if (!fileNameSet.contains(tempFileName) && !tempFileName.endsWith(FileAnalyzeUtil.END_PLAYER)) {
-                        tempFile.delete();
+                        FileUtil.deleteFile(_context, tempFile);
                     }
                 }
             }

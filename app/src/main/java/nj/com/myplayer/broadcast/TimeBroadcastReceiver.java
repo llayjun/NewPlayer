@@ -55,7 +55,7 @@ public class TimeBroadcastReceiver extends BroadcastReceiver {
                         SPRollHelper.getInstance().clear();
                         SPPlayerHelper.getInstance().clear();
                         FileAnalyzeUtil.savePlayInfo2Shared(mFile.getPath());
-                        FileHandleUtil.deleteLossFile(mFile.getPath());
+                        FileHandleUtil.deleteLossFile(_context,mFile.getPath());
                         Toast.makeText(_context, "零点写入成功", Toast.LENGTH_LONG).show();
                     }
                 }

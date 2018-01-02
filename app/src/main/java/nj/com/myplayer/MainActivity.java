@@ -332,7 +332,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                                                 case Constant.TEXT_POSITION_MIDDLE:
                                                     mTextBeanMiddle = null;
                                                     mTextBeanMiddle = _textBean;
-                                                    mShowingTimesMiddle = _textBean.getRollTimes();//字幕播放次数，中间
+                                                    mShowingTimesMiddle = Integer.parseInt(_textBean.getRollTimes());//字幕播放次数，中间
                                                     MainActivity.this.runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
@@ -343,7 +343,7 @@ public class MainActivity extends BaseActivity implements PlayerManager.PlayerSt
                                                 case Constant.TEXT_POSITION_LOWER:
                                                     mTextBeanLower = null;
                                                     mTextBeanLower = _textBean;
-                                                    mShowingTimesLower = _textBean.getRollTimes();//字幕播放次数，底部
+                                                    mShowingTimesLower = Integer.parseInt(_textBean.getRollTimes());//字幕播放次数，底部
                                                     MainActivity.this.runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {

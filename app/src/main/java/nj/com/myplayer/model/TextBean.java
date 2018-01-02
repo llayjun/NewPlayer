@@ -6,7 +6,7 @@ package nj.com.myplayer.model;
  */
 public class TextBean extends BasicBean {
 
-    private int rollTimes;//播放次数
+    private String rollTimes;//播放次数
 
     private String position;  //弹幕位置
 
@@ -22,11 +22,11 @@ public class TextBean extends BasicBean {
 
     private String content;  //弹幕内容
 
-    public int getRollTimes() {
+    public String getRollTimes() {
         return rollTimes;
     }
 
-    public void setRollTimes(int _rollTimes) {
+    public void setRollTimes(String _rollTimes) {
         rollTimes = _rollTimes;
     }
 
